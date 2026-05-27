@@ -1,0 +1,1 @@
+{"name":"umaf-platform","version":"0.1.0","private":true,"description":"UMAF Social Platform - Monorepo","scripts":{"dev":"turbo dev","build":"turbo build","lint":"turbo lint","clean":"turbo clean"},"engines":{"node":">=18"},"packageManager":"pnpm@9.1.0"}

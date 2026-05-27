@@ -1,0 +1,20 @@
+{
+  "name": "UMAF Social Platform",
+  "short_name": "UMAF",
+  "description": "Plataforma social para la gestión de personas, proyectos y pagos de UMAF",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0f172a",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "es-ES",
+  "icons": [
+    {
+      "src": "/icons/icon_192x178.png",
+      "sizes": "192x178",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

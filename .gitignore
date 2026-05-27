@@ -1,0 +1,77 @@
+# ==============================================================================
+# DEPENDENCIAS Y PAQUETES
+# ==============================================================================
+node_modules/
+/jspm_packages/
+.pnp
+.pnp.js
+
+# ==============================================================================
+# ENTORNOS DE DESARROLLO Y VARIABLES SENSIBLES (¡CRÍTICO PARA SUPABASE Y VERCEL!)
+# ==============================================================================
+# Bloquea todas las credenciales locales de Supabase y Vercel
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Archivos de configuración locales creados por Vercel CLI y Supabase CLI
+.vercel
+.supabase/functions/.env
+supabase/.env
+supabase/.env.local
+
+# ==============================================================================
+# NEXT.JS Y COMPILACIÓN (BUILD)
+# ==============================================================================
+# El directorio principal de build de Next.js
+.next/
+out/
+
+# Compilaciones de TypeScript y bundles de producción
+dist/
+build/
+
+# Caché de compilación de herramientas modernas (Vite, Turbopack, etc.)
+.turbo
+.parcel-cache
+.cache/
+
+# ==============================================================================
+# PRUEBAS Y CALIDAD (TESTING / LINTING)
+# ==============================================================================
+coverage/
+.nyc_output/
+.eslintcache
+
+# ==============================================================================
+# SISTEMA OPERATIVO Y EDITORES
+# ==============================================================================
+# Archivos específicos de VS Code y editores comunes
+.vscode/*
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/settings.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ==============================================================================
+# LOGS Y DIAGNÓSTICOS
+# ==============================================================================
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
