@@ -2,7 +2,7 @@
 
 # UI Design Principles
 
-# UMAF Social Platform
+# OWOFVzla Social Platform
 
 Version: 0.1
 Status: Draft
@@ -11,7 +11,7 @@ Status: Draft
 
 # 1. Purpose
 
-This document defines the official UI design principles for the UMAF Social Platform.
+This document defines the official UI design principles for the OWOFVzla Social Platform.
 
 The platform prioritizes:
 
@@ -84,6 +84,8 @@ The same interactions should behave consistently across:
 - lists
 - modals
 - filters
+- **invitation pages**
+- **admin panels**
 
 Predictability reduces cognitive load.
 
@@ -171,7 +173,7 @@ Avoid overwhelming users with:
 
 ---
 
-# 5.1 Layout Simplicity
+## 5.1 Layout Simplicity
 
 Layouts should remain:
 
@@ -227,7 +229,7 @@ Colors should communicate meaning consistently.
 
 Examples:
 
-```text id="mjlwm1"
+```text
 Green → success
 Red → danger
 Yellow → warning
@@ -273,7 +275,7 @@ Use typography hierarchy intentionally.
 
 Examples:
 
-```text id="xjlwm0"
+```text
 Bold → titles
 Medium → labels
 Regular → content
@@ -302,7 +304,7 @@ Prefer:
 
 ---
 
-# 8.1 Reusable Components
+## 8.1 Reusable Components
 
 All UI should be built from reusable components.
 
@@ -373,6 +375,7 @@ Examples:
 - delete
 - archive
 - remove access
+- revoke invitation
 
 ---
 
@@ -389,6 +392,7 @@ Cards should be the primary mobile layout pattern for:
 - contributions
 - activities
 - reports
+- **pending invitations**
 
 ---
 
@@ -516,7 +520,7 @@ Use a single icon system across the platform.
 
 Official icon library:
 
-```text id="zjlwm0"
+```text
 lucide-react
 ```
 
@@ -540,7 +544,7 @@ Every empty state should:
 
 Preferred pattern:
 
-```text id="rjlwm9"
+```text
 Description
 +
 Primary Action
@@ -548,7 +552,7 @@ Primary Action
 
 Example:
 
-```text id="djlwm0"
+```text
 "No projects yet"
 +
 "Create Project"
@@ -721,7 +725,7 @@ Errors should appear:
 
 Recommended responsive strategy:
 
-```text id="vjlwm0"
+```text
 Mobile
 → Tablet
 → Desktop
@@ -729,7 +733,7 @@ Mobile
 
 not:
 
-```text id="qjlwm9"
+```text
 Desktop
 → Shrink to Mobile
 ```
@@ -816,7 +820,7 @@ Visual polish is intentionally delayed.
 
 Current phase:
 
-- UI design principles definition
+- UI design principles definition (updated for invitation flows)
 
 Next phase:
 

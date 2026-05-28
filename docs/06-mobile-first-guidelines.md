@@ -2,7 +2,7 @@
 
 # Mobile-First Guidelines
 
-# UMAF Social Platform
+# OWOFVzla Social Platform
 
 Version: 0.1
 Status: Draft
@@ -11,7 +11,7 @@ Status: Draft
 
 # 1. Purpose
 
-This document defines the official mobile-first UX and UI guidelines for the UMAF Social Platform.
+This document defines the official mobile-first UX and UI guidelines for the OWOFVzla Social Platform.
 
 The platform is primarily designed for:
 
@@ -100,7 +100,7 @@ Most common operations should require:
 
 Design should start from:
 
-```text id="f5u9rn"
+```text
 320px → 480px
 ```
 
@@ -112,7 +112,7 @@ Desktop layouts are progressive enhancements.
 
 Recommended breakpoint philosophy:
 
-```text id="vpk6ep"
+```text
 Mobile First
     ↓
 Tablet Adaptation
@@ -131,11 +131,11 @@ Never:
 
 ---
 
-# 5.1 Primary Navigation
+## 5.1 Primary Navigation
 
 Preferred navigation patterns:
 
-```text id="7n2v5e"
+```text
 Bottom Navigation
 Mobile Drawer
 Floating Action Button (FAB)
@@ -144,7 +144,7 @@ Sticky Actions
 
 ---
 
-# 5.2 Navigation Simplicity
+## 5.2 Navigation Simplicity
 
 Primary navigation should avoid:
 
@@ -154,9 +154,9 @@ Primary navigation should avoid:
 
 ---
 
-# 5.3 Recommended Navigation Structure
+## 5.3 Recommended Navigation Structure
 
-```text id="rjlwm0"
+```text
 Dashboard
 Projects
 People
@@ -176,13 +176,13 @@ Avoid large enterprise-style sidebars on mobile.
 
 Interactive elements should use:
 
-```text id="y0xv5u"
+```text
 44px minimum height
 ```
 
 Preferred:
 
-```text id="qjlwm0"
+```text
 48px+
 ```
 
@@ -229,7 +229,7 @@ Typography should prioritize:
 
 Recommended minimum sizes:
 
-```text id="7o9gdp"
+```text
 Body: 16px
 Small Text: 14px
 Titles: 20px+
@@ -259,7 +259,7 @@ Prefer:
 
 ---
 
-# 8.1 Form Philosophy
+## 8.1 Form Philosophy
 
 Forms must prioritize:
 
@@ -275,7 +275,7 @@ Avoid giant forms.
 
 Preferred approaches:
 
-```text id="kjlwm0"
+```text
 Step-based forms
 Accordion sections
 Progressive disclosure
@@ -290,7 +290,7 @@ Use optimized mobile inputs whenever possible.
 
 Examples:
 
-```text id="fjlwm0"
+```text
 type="tel"
 type="email"
 type="date"
@@ -335,13 +335,13 @@ Forms should support:
 
 ---
 
-# 9.1 Avoid Desktop Tables on Mobile
+## 9.1 Avoid Desktop Tables on Mobile
 
 Large horizontal tables are discouraged.
 
 Preferred mobile patterns:
 
-```text id="0jlwm0"
+```text
 Cards
 Stacked rows
 Expandable sections
@@ -463,7 +463,7 @@ Use FABs for:
 
 Examples:
 
-```text id="mjlwm0"
+```text
 Create Person
 Create Project
 Upload Evidence
@@ -590,7 +590,7 @@ Empty states should:
 
 ## 16.2 Example Empty States
 
-```text id="ujlwm0"
+```text
 "No participants yet"
 "Create your first project"
 "No evidence uploaded"
@@ -732,7 +732,7 @@ Images should:
 
 All major features must be tested on:
 
-```text id="1jlwm0"
+```text
 Small phones
 Medium phones
 Tablet layouts
@@ -747,7 +747,32 @@ Testing should prioritize:
 
 ---
 
-# 23. UX Anti-Patterns
+# 23. Mobile-Specific Flows
+
+---
+
+## 23.1 Invitation Acceptance Page
+
+The invitation acceptance page (`/accept-invite`) must be fully mobile-optimized:
+
+- Clear instructions
+- Large touch-friendly input for password and name
+- Prominent submit button
+- Minimal distractions
+
+---
+
+## 23.2 Admin Invitation Panel
+
+The SUPER_ADMIN panel for inviting users (`/admin/users`) must be usable on mobile:
+
+- Simple form (email, role selector)
+- List of pending invitations with clear actions (resend, revoke)
+- Card-based layout, not a dense table
+
+---
+
+# 24. UX Anti-Patterns
 
 Avoid:
 
@@ -762,7 +787,7 @@ Avoid:
 
 ---
 
-# 24. Future UI Expansion
+# 25. Future UI Expansion
 
 Future versions may include:
 
@@ -776,11 +801,11 @@ without replacing the mobile-first foundation.
 
 ---
 
-# 25. Current Status
+# 26. Current Status
 
 Current phase:
 
-- Mobile-first UX definition
+- Mobile-first UX definition (updated for invitation flows)
 
 Next phase:
 

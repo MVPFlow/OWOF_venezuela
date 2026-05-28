@@ -2,7 +2,7 @@
 
 # Tech Stack
 
-# UMAF Social Platform
+# OWOFVzla Social Platform
 
 Version: 0.1
 Status: Draft
@@ -11,7 +11,7 @@ Status: Draft
 
 # 1. Purpose
 
-This document defines the official technology stack for the UMAF Social Platform.
+This document defines the official technology stack for the OWOFVzla Social Platform.
 
 The selected technologies prioritize:
 
@@ -51,7 +51,7 @@ using a lean and modern stack.
 
 ## 3.1 Frontend Framework
 
-```text id="uyrz6q"
+```text
 Next.js
 ```
 
@@ -72,7 +72,7 @@ Chosen because it provides:
 
 ## 3.2 Frontend Language
 
-```text id="lc9f2v"
+```text
 TypeScript
 ```
 
@@ -91,7 +91,7 @@ Required for:
 
 ## 3.3 UI Library
 
-```text id="z5jlwm"
+```text
 React
 ```
 
@@ -112,7 +112,7 @@ Provides:
 
 ## 4.1 CSS Framework
 
-```text id="bmw0gn"
+```text
 TailwindCSS
 ```
 
@@ -130,7 +130,7 @@ Chosen because it:
 
 ## 4.2 Component System
 
-```text id="nkvjhr"
+```text
 shadcn/ui
 ```
 
@@ -148,7 +148,7 @@ Provides:
 
 ## 4.3 Icons
 
-```text id="g14x4u"
+```text
 lucide-react
 ```
 
@@ -169,7 +169,7 @@ Chosen for:
 
 ## 5.1 Backend Platform
 
-```text id="b6u0gn"
+```text
 Supabase
 ```
 
@@ -188,7 +188,7 @@ Supabase handles:
 
 ## 5.2 Database Engine
 
-```text id="8j8i0s"
+```text
 PostgreSQL
 ```
 
@@ -206,7 +206,7 @@ Chosen because it supports:
 
 ## 5.3 ORM
 
-```text id="r11f5y"
+```text
 Drizzle ORM
 ```
 
@@ -229,7 +229,7 @@ Chosen because:
 
 ## 6.1 Authentication Provider
 
-```text id="5l9z8x"
+```text
 Supabase Auth
 ```
 
@@ -237,12 +237,18 @@ Supabase Auth
 
 Supported initially:
 
-- email/password
+- email/password (only for invited users)
 
-Future support:
+**Registration flow**:
 
-- magic links
-- OAuth providers
+- No public sign-up.
+- Only SUPER_ADMIN can invite new users.
+- Invited users receive an email with a magic-like invitation link (one-time token) to set their password and activate their account.
+
+### Future Authentication Methods
+
+- Magic links
+- OAuth providers (Google, etc.)
 
 ---
 
@@ -250,9 +256,9 @@ Future support:
 
 ---
 
-# 7.1 Server State
+## 7.1 Server State
 
-```text id="ktvq9w"
+```text
 TanStack Query
 ```
 
@@ -265,9 +271,9 @@ TanStack Query
 
 ---
 
-# 7.2 Client State
+## 7.2 Client State
 
-```text id="3t50o7"
+```text
 Zustand
 ```
 
@@ -279,7 +285,7 @@ Only use Zustand for:
 - temporary client state
 - UI coordination
 
-Avoid unnecessary global stores.
+Avoid unnecessary global state.
 
 ---
 
@@ -289,7 +295,7 @@ Avoid unnecessary global stores.
 
 ## 8.1 Forms
 
-```text id="gm5oyl"
+```text
 React Hook Form
 ```
 
@@ -307,7 +313,7 @@ Chosen because:
 
 ## 8.2 Validation
 
-```text id="yd4zdi"
+```text
 Zod
 ```
 
@@ -326,7 +332,7 @@ Zod
 
 ## 9.1 Storage Provider
 
-```text id="z6pc0h"
+```text
 Supabase Storage
 ```
 
@@ -346,7 +352,7 @@ Supabase Storage
 
 ## 10.1 PWA Support
 
-```text id="e7vq2q"
+```text
 next-pwa
 ```
 
@@ -365,7 +371,7 @@ next-pwa
 
 ## 11.1 Frontend Hosting
 
-```text id="e34y14"
+```text
 Vercel
 ```
 
@@ -382,8 +388,47 @@ Provides:
 
 ## 11.2 Backend Hosting
 
-```text id="rjlwm8"
+```text
 Supabase Cloud
+```
+
+---
+
+## 11.3 Email Service
+
+```text
+Resend
+```
+
+### Reasoning
+
+Chosen for:
+
+- developer-friendly API
+- **free plan: 100 emails/day** (sufficient for MVP)
+- React Email integration for template rendering
+- reliable delivery
+- simple setup with Next.js (server actions or route handlers)
+
+### Usage in the Platform
+
+Emails are used for:
+
+- **User invitations** – sending unique invitation links with one-time tokens to new organizers (COORDINATOR, DIRECTOR, ACCOUNTING, etc.)
+- Future: password reset, notifications, sponsor communications
+
+### Cost & Scalability
+
+- The free tier (100 emails/day) is adequate for initial growth (inviting organizers and basic notifications).
+- If volume exceeds this threshold, the team can:
+  - Upgrade Resend plan (pay-as-you-go)
+  - Migrate to AWS SES or SendGrid
+
+### Environment Variables
+
+```env
+RESEND_API_KEY=re_xxxxx
+EMAIL_FROM=noreply@owofvzla.org (or verified domain)
 ```
 
 ---
@@ -394,7 +439,7 @@ Supabase Cloud
 
 ## 12.1 Repository Hosting
 
-```text id="qjlwm1"
+```text
 GitHub
 ```
 
@@ -404,7 +449,7 @@ GitHub
 
 Initial strategy:
 
-```text id="yq48ta"
+```text
 main
 develop
 feature/*
@@ -419,7 +464,7 @@ hotfix/*
 
 ## 13.1 Package Manager
 
-```text id="w4shv8"
+```text
 pnpm
 ```
 
@@ -438,7 +483,7 @@ Chosen because:
 
 Recommended structure:
 
-```text id="mjlwm4"
+```text
 /apps
     /web
 
@@ -458,7 +503,7 @@ Recommended structure:
 
 ## 15.1 Unit Testing
 
-```text id="0mxzph"
+```text
 Vitest
 ```
 
@@ -466,7 +511,7 @@ Vitest
 
 ## 15.2 Component Testing
 
-```text id="p4nz7x"
+```text
 Testing Library
 ```
 
@@ -474,7 +519,7 @@ Testing Library
 
 ## 15.3 End-to-End Testing
 
-```text id="0j4s8n"
+```text
 Playwright
 ```
 
@@ -482,7 +527,7 @@ Playwright
 
 Critical workflow testing:
 
-- authentication
+- authentication (invitation acceptance)
 - mobile navigation
 - forms
 - uploads
@@ -496,7 +541,7 @@ Critical workflow testing:
 
 ## 16.1 Linting
 
-```text id="yx7z8k"
+```text
 ESLint
 ```
 
@@ -504,7 +549,7 @@ ESLint
 
 ## 16.2 Formatting
 
-```text id="mjlwm9"
+```text
 Prettier
 ```
 
@@ -512,7 +557,7 @@ Prettier
 
 ## 16.3 Git Hooks
 
-```text id="q1qf59"
+```text
 Husky
 ```
 
@@ -530,7 +575,7 @@ Husky
 
 ## 17.1 Environment Files
 
-```text id="h0wvmr"
+```text
 .env.local
 .env.development
 .env.staging
@@ -590,7 +635,7 @@ Advanced media handling comes later.
 
 Initial monitoring stack:
 
-```text id="wx4hpi"
+```text
 Vercel Analytics
 Supabase Logs
 Console Logging
@@ -613,6 +658,7 @@ Core security mechanisms:
 - protected route middleware
 - server-side validation
 - secure uploads
+- invitation token system (one-time, expiring)
 
 ---
 
@@ -671,7 +717,6 @@ Future additions may include:
 - Sentry
 - PostHog
 - Stripe
-- Resend
 - Cloudflare Images
 - Expo
 - Queue systems
@@ -685,11 +730,11 @@ depending on platform growth.
 
 Current phase:
 
-- Technical foundation definition
+- Technical foundation definition (including invitation system)
 
 Next phase:
 
-- Business rules definition
+- Business rules definition (invitation rules, public project pages)
 
 ---
 
@@ -735,3 +780,7 @@ Testing:
 Deployment:
 
 - Vercel
+
+Email:
+
+- Resend (free tier, for invitations and notifications)

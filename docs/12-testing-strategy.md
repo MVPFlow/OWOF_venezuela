@@ -2,7 +2,7 @@
 
 # Testing Strategy
 
-# UMAF Social Platform
+# OWOFVzla Social Platform
 
 Version: 0.1
 Status: Draft
@@ -11,7 +11,7 @@ Status: Draft
 
 # 1. Purpose
 
-This document defines the official testing strategy for the UMAF Social Platform.
+This document defines the official testing strategy for the OWOFVzla Social Platform.
 
 The testing philosophy prioritizes:
 
@@ -67,7 +67,7 @@ Testing exists to:
 
 Testing priority order:
 
-1. Authentication
+1. Authentication (including invitation acceptance)
 2. Permissions
 3. Financial operations
 4. Upload workflows
@@ -86,6 +86,7 @@ Focus testing effort on:
 - workflows
 - permissions
 - integrations
+- **invitation token validation and expiration**
 
 Avoid excessive testing of:
 
@@ -116,7 +117,7 @@ Avoid:
 
 The platform uses multiple testing layers:
 
-```text id="jlwm40"
+```text
 Type Safety
     ↓
 Unit Tests
@@ -138,7 +139,7 @@ Manual Mobile Validation
 
 Minimum required validation:
 
-```text id="jlwm41"
+```text
 tsc
 ```
 
@@ -172,6 +173,8 @@ Unit tests should focus on:
 - business rules
 - formatting logic
 - permissions
+- **invitation token generation and expiration logic**
+- **email template rendering (without sending)**
 
 ---
 
@@ -179,7 +182,7 @@ Unit tests should focus on:
 
 Official unit testing stack:
 
-```text id="jlwm42"
+```text
 Vitest
 ```
 
@@ -204,6 +207,8 @@ Prioritize testing:
 - permission checks
 - validation logic
 - state transformations
+- **invitation token validation (expired, used, invalid)**
+- **role checks for invitation creation (SUPER_ADMIN only)**
 
 ---
 
@@ -220,6 +225,8 @@ Integration tests should validate:
 - service orchestration
 - authentication flows
 - upload flows
+- **invitation creation → email sending → acceptance flow**
+- **public project landing page data fetching**
 
 ---
 
@@ -230,6 +237,7 @@ Ensure:
 - modules communicate correctly
 - validation layers work together
 - permissions remain enforced
+- **invitation tokens are properly stored and invalidated after use**
 
 ---
 
@@ -251,7 +259,7 @@ E2E tests should validate:
 
 Official E2E stack:
 
-```text id="jlwm43"
+```text
 Playwright
 ```
 
@@ -261,8 +269,9 @@ Playwright
 
 Critical workflows include:
 
-```text id="jlwm44"
-Authentication
+```text
+Authentication (login)
+Invitation acceptance (full flow: create invitation → email → accept → login)
 Create Person
 Create Project
 Assign Participant
@@ -270,6 +279,7 @@ Create Contribution
 Register Payment
 Upload Evidence
 Permission Restrictions
+Public project landing page visibility
 ```
 
 ---
@@ -282,6 +292,7 @@ E2E tests should prioritize:
 - touch interactions
 - responsive flows
 - upload workflows
+- **invitation acceptance on mobile**
 
 ---
 
@@ -316,6 +327,7 @@ Validate:
 - keyboard interactions
 - upload usability
 - navigation ergonomics
+- **invitation acceptance form usability**
 
 ---
 
@@ -328,8 +340,12 @@ Validate:
 Permissions must be tested across:
 
 - roles
-- organizations
 - ownership states
+
+Specifically for invitations:
+
+- **SUPER_ADMIN** can create, resend, revoke invitations
+- **DIRECTOR, COORDINATOR, etc.** cannot access invitation endpoints
 
 ---
 
@@ -346,7 +362,10 @@ Tests should verify:
 
 ## 10.3 RLS Validation
 
-Supabase Row-Level Security must be validated explicitly.
+Supabase Row-Level Security must be validated explicitly, especially for:
+
+- `invitations` table (only SUPER_ADMIN can read/write)
+- `users` table (only SUPER_ADMIN can modify roles)
 
 ---
 
@@ -366,7 +385,18 @@ API tests should validate:
 
 ---
 
-## 11.2 Error Scenarios
+## 11.2 Invitation-Specific API Tests
+
+Test endpoints:
+
+- `POST /api/invitations` (SUPER_ADMIN only, validate email and role)
+- `POST /api/invitations/accept` (public, test expired token, already used token, invalid token)
+- `DELETE /api/invitations/[id]` (SUPER_ADMIN only)
+- `PATCH /api/invitations/[id]/resend` (SUPER_ADMIN only, regenerate token)
+
+---
+
+## 11.3 Error Scenarios
 
 Test:
 
@@ -375,6 +405,8 @@ Test:
 - malformed requests
 - invalid uploads
 - forbidden access
+- **attempt to accept invitation twice**
+- **attempt to accept expired invitation**
 
 ---
 
@@ -416,6 +448,8 @@ Forms should validate:
 - invalid formats
 - edge cases
 - server validation failures
+
+Include invitation acceptance form (password, name).
 
 ---
 
@@ -464,13 +498,14 @@ UI tests should prioritize:
 
 High-priority regression areas:
 
-```text id="jlwm45"
-Authentication
-Permissions
+```text
+Authentication (including invitation flow)
+Permissions (especially invitation creation)
 Payments
 Uploads
-Visibility Rules
+Visibility Rules (public project pages)
 Mobile Navigation
+Invitation token validation
 ```
 
 ---
@@ -496,7 +531,7 @@ Tests should remain close to related modules whenever possible.
 
 Example:
 
-```text id="jlwm46"
+```text
 /domain-name/__tests__
 ```
 
@@ -506,7 +541,7 @@ Example:
 
 Recommended structure:
 
-```text id="jlwm47"
+```text
 /tests/e2e
 ```
 
@@ -516,10 +551,11 @@ Recommended structure:
 
 Examples:
 
-```text id="jlwm48"
+```text
 people.service.test.ts
 payments.validation.test.ts
 auth.e2e.spec.ts
+invitations.accept.e2e.spec.ts
 ```
 
 ---
@@ -537,6 +573,8 @@ Avoid:
 - excessive mocking
 - unrealistic behavior
 - hidden assumptions
+
+For email tests: mock Resend client to avoid actual email sending.
 
 ---
 
@@ -562,19 +600,24 @@ Reusable fixtures should remain:
 - explicit
 - predictable
 
+Include:
+
+- a pre-seeded organization (OWOFVzla)
+- a SUPER_ADMIN user (Saturno)
+- a valid invitation token for tests
+
 ---
 
 ## 18.2 Seed Data
 
 Test seed data should include:
 
-- users
+- users (SUPER_ADMIN, COORDINATOR, etc.)
 - projects
 - participants
 - contributions
 - permissions
-
-for realistic validation.
+- **invitations in various states (pending, expired, used)**
 
 ---
 
@@ -624,8 +667,6 @@ Focus on:
 - real-world accessibility
 - mobile readability
 
-before advanced compliance systems.
-
 ---
 
 # 21. CI Testing Strategy
@@ -638,10 +679,10 @@ GitHub Actions should remain lightweight initially.
 
 Recommended CI tasks:
 
-```text id="jlwm49"
+```text
 TypeScript validation
 Linting
-Unit tests
+Unit tests (excluding email sending)
 ```
 
 ---
@@ -655,6 +696,7 @@ Examples:
 - full builds
 - large E2E suites
 - performance testing
+- end-to-end invitation email testing (uses external API)
 
 ---
 
@@ -704,6 +746,7 @@ Human QA remains mandatory for:
 - upload flows
 - permissions
 - responsiveness
+- **email delivery and acceptance flow**
 
 ---
 
@@ -714,6 +757,7 @@ Real-world workflows should be validated periodically using:
 - realistic devices
 - realistic connectivity
 - realistic usage patterns
+- **real email inboxes for invitation tests**
 
 ---
 
@@ -740,6 +784,7 @@ Future testing expansion may include:
 - security scanning
 - performance budgets
 - automated mobile device testing
+- **email delivery monitoring**
 
 depending on platform growth.
 
@@ -749,7 +794,7 @@ depending on platform growth.
 
 Current phase:
 
-- Testing strategy definition
+- Testing strategy definition (updated for invitations, public project pages, email)
 
 Next phase:
 

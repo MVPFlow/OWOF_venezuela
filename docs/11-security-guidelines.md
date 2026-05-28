@@ -2,7 +2,7 @@
 
 # Security Guidelines
 
-# UMAF Social Platform
+# OWOFVzla Social Platform
 
 Version: 0.1
 Status: Draft
@@ -11,7 +11,7 @@ Status: Draft
 
 # 1. Purpose
 
-This document defines the official security guidelines for the UMAF Social Platform.
+This document defines the official security guidelines for the OWOFVzla Social Platform.
 
 The platform manages:
 
@@ -77,6 +77,8 @@ Users should only access:
 
 required for their role.
 
+**Invitation creation** is restricted to SUPER_ADMIN only.
+
 ---
 
 ## 3.2 Server-Side Enforcement
@@ -87,11 +89,9 @@ Frontend validation is not a security boundary.
 
 ---
 
-## 3.3 Organization Isolation
+## 3.3 Single Organization (MVP)
 
-All organization data must remain isolated.
-
-Cross-organization access is forbidden unless explicitly approved by future architecture decisions.
+The MVP operates with a single organization (OWOFVzla). No cross-organization access exists.
 
 ---
 
@@ -113,9 +113,11 @@ Sensitive operations must remain:
 
 Official authentication provider:
 
-```text id="jlwm30"
+```text
 Supabase Auth
 ```
+
+**Registration is invitation-only**. There is no public sign-up endpoint.
 
 ---
 
@@ -124,7 +126,7 @@ Supabase Auth
 Protected routes must validate:
 
 - active session
-- organization membership
+- organization membership (implicitly OWOFVzla)
 - permissions
 
 before rendering sensitive data.
@@ -155,6 +157,34 @@ Authentication handling should remain delegated to Supabase Auth.
 
 ---
 
+## 4.5 Invitation Token Security
+
+Invitation tokens are critical security assets. They must be:
+
+- **Cryptographically random** – use UUID v4 or secure random generator
+- **Stored with unique constraint** – no two invitations share the same token
+- **Single-use** – after acceptance, `used_at` is set and the token is invalidated
+- **Time-limited** – expire after 7 days (configurable)
+- **Validated server-side** – never trust client-side expiration checks
+
+The `invitations` table must have indexes on `token` and `expires_at` for efficient validation.
+
+**Never** expose tokens in URLs that are logged or sent to third parties.
+
+---
+
+## 4.6 Email Security (Resend)
+
+When sending invitation emails via Resend:
+
+- Use a **verified sending domain** (e.g., `invitations@owofvzla.org`)
+- Never include the token in plain text in server logs
+- Sanitize any user-generated content before inserting into email templates
+- Include clear **expiration warning** and **security notice** (e.g., "If you didn't request this, ignore this email")
+- Use **HTTPS-only links** pointing to `/accept-invite?token=...`
+
+---
+
 # 5. Authorization Security
 
 ---
@@ -169,6 +199,8 @@ All protected operations must validate:
 
 before execution.
 
+**Invitation operations** (create, resend, revoke) must check `role = SUPER_ADMIN`.
+
 ---
 
 ## 5.2 Row-Level Security
@@ -177,14 +209,22 @@ Supabase RLS is mandatory.
 
 RLS policies should enforce:
 
-- organization ownership
+- organization ownership (only OWOFVzla data)
 - resource ownership
 - visibility rules
 - role restrictions
 
+For the `invitations` table, RLS must ensure that only SUPER_ADMIN can view, create, or delete invitations. The public `accept-invite` endpoint bypasses RLS but validates the token separately.
+
 ---
 
-## 5.3 Frontend Restrictions
+## 5.3 Person-User Relationship (Future)
+
+The `people.user_id` field (nullable, 1:1) must be secured so that only the linked user or SUPER_ADMIN can modify it.
+
+---
+
+## 5.4 Frontend Restrictions
 
 Frontend permission checks are only:
 
@@ -211,7 +251,7 @@ All API payloads must validate:
 
 using:
 
-```text id="jlwm31"
+```text
 Zod
 ```
 
@@ -227,7 +267,7 @@ Critical validation must NEVER rely only on frontend validation.
 
 The following are forbidden:
 
-```text id="jlwm32"
+```text
 raw SQL concatenation
 unsafe eval execution
 dynamic code execution
@@ -245,6 +285,15 @@ APIs must never expose:
 - internal infrastructure
 - secrets
 - environment variables
+
+---
+
+## 6.5 Invitation-Specific API Security
+
+- `POST /api/invitations` – only SUPER_ADMIN; validate email format and role
+- `POST /api/invitations/accept` – public endpoint; validate token existence, expiration, and unused status; do not leak why a token is invalid (generic error: "Invalid or expired invitation")
+- `DELETE /api/invitations/[id]` – only SUPER_ADMIN
+- `PATCH /api/invitations/[id]/resend` – only SUPER_ADMIN; regenerate token and send new email
 
 ---
 
@@ -280,7 +329,7 @@ If raw SQL becomes necessary:
 
 Queries must always remain scoped to:
 
-- organization ownership
+- organization ownership (only OWOFVzla)
 - permissions
 - visibility rules
 
@@ -295,6 +344,7 @@ Examples:
 - internal notes
 - financial details
 - private documents
+- `invitations.token` (though stored in plain text, access restricted by RLS)
 
 ---
 
@@ -319,7 +369,7 @@ All uploads must validate:
 
 The following file types are forbidden:
 
-```text id="jlwm33"
+```text
 .exe
 .bat
 .cmd
@@ -362,7 +412,7 @@ before access.
 
 The following is forbidden unless explicitly approved:
 
-```text id="jlwm34"
+```text
 dangerouslySetInnerHTML
 ```
 
@@ -402,13 +452,21 @@ Sensitive credentials must only exist in:
 
 Never hardcode secrets.
 
+Required variables for invitations:
+
+```env
+RESEND_API_KEY=re_xxxxx
+EMAIL_FROM=noreply@owofvzla.org
+NEXT_PUBLIC_APP_URL=https://app.owofvzla.org
+```
+
 ---
 
 ## 10.2 Client vs Server Variables
 
 Only public-safe variables may use:
 
-```text id="jlwm35"
+```text
 NEXT_PUBLIC_
 ```
 
@@ -469,6 +527,7 @@ Never log:
 - access tokens
 - private keys
 - sensitive personal data
+- **invitation tokens** (log only that an invitation was created, not the token itself)
 
 ---
 
@@ -480,13 +539,15 @@ Critical operations should generate:
 - timestamps
 - responsible user tracking
 
+Track invitation events: creation, resend, revocation, acceptance.
+
 ---
 
 ## 12.3 AI Development Logs
 
 AI execution sessions should append entries to:
 
-```text id="jlwm36"
+```text
 /ops/dev-logs.md
 ```
 
@@ -510,7 +571,7 @@ Heavy pipelines may remain local until future architecture decisions expand CI/C
 
 Protected branches:
 
-```text id="jlwm37"
+```text
 main
 master
 ```
@@ -523,7 +584,7 @@ Direct commits are forbidden.
 
 Development should occur through isolated branches:
 
-```text id="jlwm38"
+```text
 dev-[task]-[date]
 ai-[task]-[date]
 ```
@@ -538,7 +599,7 @@ ai-[task]-[date]
 
 Separate environments must exist:
 
-```text id="jlwm39"
+```text
 development
 staging
 production
@@ -558,85 +619,21 @@ Expose only infrastructure that is operationally necessary.
 
 ---
 
-# 15. Mobile Security Considerations
+# 15. Public Portal Security
 
 ---
 
-## 15.1 Mobile Session Protection
-
-Sensitive operations should validate:
-
-- active session
-- permission scope
-- ownership
-
-even on mobile devices.
-
----
-
-## 15.2 Offline Considerations
-
-Offline support must avoid exposing:
-
-- sensitive cached data
-- unrestricted local persistence
-
-without proper safeguards.
-
----
-
-# 16. AI-Assisted Development Security
-
----
-
-## 16.1 AI Code Requirements
-
-AI-generated code must:
-
-- follow security standards
-- avoid unsafe patterns
-- validate inputs
-- remain type-safe
-
----
-
-## 16.2 AI Limitation Disclosure
-
-If AI-generated code introduces:
-
-- assumptions
-- temporary workarounds
-- unverified behavior
-
-it must explicitly communicate those limitations.
-
----
-
-## 16.3 Technical Debt Reporting
-
-Security-related technical debt must:
-
-- remain visible
-- be documented
-- be tracked explicitly
-
----
-
-# 17. Public Portal Security
-
----
-
-## 17.1 Public Visibility Rules
+## 15.1 Public Visibility Rules
 
 Only approved public content may appear:
 
 - on landing pages
-- public project pages
+- **public project landing pages (`/proyectos/[slug]`)**
 - transparency sections
 
 ---
 
-## 17.2 Sensitive Data Protection
+## 15.2 Sensitive Data Protection
 
 Public pages must NEVER expose:
 
@@ -644,14 +641,17 @@ Public pages must NEVER expose:
 - private uploads
 - financial internals
 - protected personal information
+- invitation tokens or internal user data
+
+Public project pages must filter data based on `visibility = 'public'` and only show approved notes, evidence, and participant summaries.
 
 ---
 
-# 18. Rate Limiting & Abuse Prevention
+# 16. Rate Limiting & Abuse Prevention
 
 ---
 
-## 18.1 Sensitive Endpoint Protection
+## 16.1 Sensitive Endpoint Protection
 
 Sensitive endpoints should support:
 
@@ -663,7 +663,7 @@ when operationally necessary.
 
 ---
 
-## 18.2 Upload Abuse Prevention
+## 16.2 Upload Abuse Prevention
 
 Uploads should support:
 
@@ -673,11 +673,17 @@ Uploads should support:
 
 ---
 
-# 19. Security Incident Philosophy
+## 16.3 Invitation Acceptance Rate Limiting
+
+The public endpoint `/api/invitations/accept` should be rate-limited (e.g., 5 attempts per IP per hour) to prevent brute-force token guessing.
 
 ---
 
-## 19.1 Explicit Incident Handling
+# 17. Security Incident Philosophy
+
+---
+
+## 17.1 Explicit Incident Handling
 
 Security issues should NEVER remain hidden.
 
@@ -689,7 +695,7 @@ Critical vulnerabilities must:
 
 ---
 
-## 19.2 Temporary Mitigations
+## 17.2 Temporary Mitigations
 
 Temporary mitigations should:
 
@@ -699,7 +705,7 @@ Temporary mitigations should:
 
 ---
 
-# 20. Security Anti-Patterns
+# 18. Security Anti-Patterns
 
 Avoid:
 
@@ -712,10 +718,12 @@ Avoid:
 - unvalidated uploads
 - blind trust in frontend validation
 - giant unsafe dependencies
+- logging invitation tokens
+- public registration endpoints
 
 ---
 
-# 21. Long-Term Security Goals
+# 19. Long-Term Security Goals
 
 Future versions may include:
 
@@ -731,11 +739,11 @@ as the platform grows.
 
 ---
 
-# 22. Current Status
+# 20. Current Status
 
 Current phase:
 
-- Security guidelines definition
+- Security guidelines definition (updated for invitations, email, public project pages)
 
 Next phase:
 

@@ -1,16 +1,16 @@
 # Project Charter
 
-# UMAF Social Platform
+# OWOFVzla Social Platform
 
 Version: 0.1
 Status: Draft
-Organization: Un Mundo Una Familia - Venezuela
+Organization: One World One Family - Venezuela
 
 ---
 
 # 1. Project Overview
 
-UMAF Social Platform is a mobile-first Progressive Web Application (PWA) designed to centralize the management of social impact projects, beneficiaries, sponsors, volunteers, contributions, evidences, and transparency processes for the foundation.
+OWOFVzla Social Platform is a mobile-first Progressive Web Application (PWA) designed to centralize the management of social impact projects, beneficiaries, sponsors, volunteers, contributions, evidences, and transparency processes for the foundation "One World One Family Venezuela".
 
 The platform aims to provide operational efficiency, transparency, scalability, and ease of use for both internal members and public users.
 
@@ -199,11 +199,19 @@ Deployment:
 
 # 10. Architectural Principles
 
-## 10.1 People-Centric Architecture
+## 10.1 Single Organization Model
+
+The MVP operates with a single pre-seeded organization: "One World One Family Venezuela" (slug: "owofvzla"). No organization creation form is needed. This simplifies the data model and seed strategy while keeping the schema future-ready for multi-organization scenarios.
+
+---
+
+## 10.2 People-Centric Architecture
 
 People exist independently from projects.
 
 Projects create relationships between people.
+
+People may eventually hold user accounts (1:1 optional relationship between `people` and `users`). This allows future sponsor/donor portals where a person logged in can view their own contributions, beneficiaries, and project history.
 
 ---
 

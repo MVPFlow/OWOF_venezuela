@@ -2,7 +2,7 @@
 
 # Folder Structure
 
-# UMAF Social Platform
+# OWOFVzla Social Platform
 
 Version: 0.1
 Status: Draft
@@ -11,7 +11,7 @@ Status: Draft
 
 # 1. Purpose
 
-This document defines the official repository and folder structure standards for the UMAF Social Platform.
+This document defines the official repository and folder structure standards for the OWOFVzla Social Platform.
 
 The structure prioritizes:
 
@@ -198,7 +198,7 @@ Examples:
 ```text
 /
 about
-projects
+proyectos/[slug]    (public project landing pages)
 transparency
 donate
 ```
@@ -215,9 +215,11 @@ Examples:
 
 ```text
 /login
-/register
+/accept-invite      (public route for invitation acceptance)
 /forgot-password
 ```
+
+Note: There is no public `/register` route. Registration is invitation-only.
 
 ---
 
@@ -236,6 +238,7 @@ Examples:
 /payments
 /reports
 /settings
+/admin/users         (SUPER_ADMIN only - invitation management)
 ```
 
 ---
@@ -314,6 +317,7 @@ Initial platform domains:
 /reports
 /settings
 /public
+/invitations       (admin only, invitation flow)
 ```
 
 ---
@@ -416,6 +420,7 @@ Examples:
 auth.service.ts
 upload.service.ts
 permissions.service.ts
+email.service.ts      (Resend integration for invitations)
 ```
 
 Services should contain:
@@ -462,6 +467,7 @@ supabase.ts
 drizzle.ts
 logger.ts
 utils.ts
+resend.ts            (email client configuration)
 ```
 
 ---
@@ -480,6 +486,7 @@ Examples:
 navigation.config.ts
 roles.config.ts
 upload.config.ts
+invitation.config.ts  (expiration days, etc.)
 ```
 
 ---
@@ -592,6 +599,7 @@ Recommended structure:
     /projects
     /payments
     /uploads
+    /invitations     (POST, GET, PATCH, DELETE - SUPER_ADMIN only)
 ```
 
 ---
@@ -669,6 +677,7 @@ Examples:
 - people validators
 - payment validators
 - project validators
+- invitation validators
 
 ---
 
@@ -709,6 +718,7 @@ Examples:
 people.spec.md
 projects.spec.md
 payments.spec.md
+invitations.spec.md
 ```
 
 ---
@@ -727,6 +737,7 @@ Examples:
 sponsorship-flow.md
 payment-flow.md
 project-flow.md
+invitation-flow.md
 ```
 
 ---
@@ -744,6 +755,7 @@ Examples:
 ```text
 ADR-001-use-supabase.md
 ADR-002-mobile-first.md
+ADR-003-invitation-only-registration.md
 ```
 
 ---
@@ -774,7 +786,7 @@ Shared E2E tests:
 
 Use:
 
-```text id="jlwm12"
+```text
 PascalCase.tsx
 ```
 
@@ -783,6 +795,7 @@ Examples:
 ```text
 PersonCard.tsx
 ProjectForm.tsx
+InviteUserForm.tsx
 ```
 
 ---
@@ -791,7 +804,7 @@ ProjectForm.tsx
 
 Use:
 
-```text id="jlwm13"
+```text
 use-*.ts
 ```
 
@@ -800,6 +813,7 @@ Examples:
 ```text
 useAuth.ts
 useUpload.ts
+useInvitations.ts
 ```
 
 ---
@@ -808,7 +822,7 @@ useUpload.ts
 
 Use:
 
-```text id="jlwm14"
+```text
 *.service.ts
 ```
 
@@ -817,6 +831,8 @@ Examples:
 ```text
 auth.service.ts
 payments.service.ts
+email.service.ts
+invitations.service.ts
 ```
 
 ---
@@ -825,7 +841,7 @@ payments.service.ts
 
 Use:
 
-```text id="jlwm15"
+```text
 *.schema.ts
 ```
 
@@ -834,6 +850,7 @@ Examples:
 ```text
 person.schema.ts
 payment.schema.ts
+invitation.schema.ts
 ```
 
 ---
@@ -842,7 +859,7 @@ payment.schema.ts
 
 Preferred import hierarchy:
 
-```text id="jlwm16"
+```text
 1. External libraries
 2. Shared packages
 3. Internal domains
@@ -928,7 +945,7 @@ Avoid:
 
 Current phase:
 
-- Folder structure definition
+- Folder structure definition (updated for invitations and public project pages)
 
 Next phase:
 

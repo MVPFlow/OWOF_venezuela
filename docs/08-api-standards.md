@@ -2,7 +2,7 @@
 
 # API Standards
 
-# UMAF Social Platform
+# OWOFVzla Social Platform
 
 Version: 0.1
 Status: Draft
@@ -11,7 +11,7 @@ Status: Draft
 
 # 1. Purpose
 
-This document defines the official API architecture and communication standards for the UMAF Social Platform.
+This document defines the official API architecture and communication standards for the OWOFVzla Social Platform.
 
 The API strategy must guarantee:
 
@@ -115,7 +115,7 @@ APIs should return consistent response patterns across the platform.
 
 Recommended route structure:
 
-```text id="u4n9pb"
+```text
 /api
     /auth
     /people
@@ -124,6 +124,7 @@ Recommended route structure:
     /payments
     /files
     /reports
+    /invitations   (admin only, SUPER_ADMIN)
 ```
 
 ---
@@ -166,6 +167,7 @@ Used for:
 - complex operations
 - uploads
 - workflow actions
+- **creating invitations**
 
 ---
 
@@ -176,6 +178,7 @@ Used for:
 - partial updates
 - status changes
 - lightweight modifications
+- **resending invitations**
 
 Preferred over PUT in most cases.
 
@@ -187,6 +190,7 @@ Used primarily for:
 
 - soft deletes
 - archive actions
+- **revoking invitations**
 
 Avoid destructive permanent deletion.
 
@@ -206,10 +210,11 @@ Use:
 
 Examples:
 
-```text id="jlwm01"
+```text
 /api/people
 /api/projects
 /api/project-types
+/api/invitations
 ```
 
 ---
@@ -220,16 +225,20 @@ Use explicit action names.
 
 Examples:
 
-```text id="jlwm02"
+```text
 archiveProject
 createPayment
 uploadEvidence
 assignParticipant
+inviteUser
+acceptInvite
+resendInvitation
+revokeInvitation
 ```
 
 Avoid vague names like:
 
-```text id="jlwm03"
+```text
 handleData
 processItem
 submitThing
@@ -318,7 +327,7 @@ Avoid leaking:
 
 Recommended error codes:
 
-```text id="jlwm04"
+```text
 VALIDATION_ERROR
 UNAUTHORIZED
 FORBIDDEN
@@ -326,6 +335,8 @@ NOT_FOUND
 CONFLICT
 RATE_LIMITED
 INTERNAL_ERROR
+INVITATION_EXPIRED
+INVITATION_ALREADY_USED
 ```
 
 ---
@@ -338,9 +349,11 @@ INTERNAL_ERROR
 
 Authentication handled using:
 
-```text id="jlwm05"
+```text
 Supabase Auth
 ```
+
+**Registration is invitation-only**. There is no public sign-up endpoint.
 
 ---
 
@@ -349,7 +362,7 @@ Supabase Auth
 Protected endpoints must validate:
 
 - authenticated session
-- organization ownership
+- organization ownership (implicitly OWOFVzla)
 - role permissions
 
 before executing operations.
@@ -360,13 +373,13 @@ before executing operations.
 
 Unauthorized requests should return:
 
-```text id="jlwm06"
+```text
 401 Unauthorized
 ```
 
 Forbidden requests should return:
 
-```text id="jlwm07"
+```text
 403 Forbidden
 ```
 
@@ -389,11 +402,19 @@ Permissions must always be validated:
 
 ## 12.2 Organization Isolation
 
-All requests must remain scoped to:
+All requests must remain scoped to the single organization (OWOFVzla). Cross-organization access is not applicable in MVP.
 
-- organization ownership
+---
 
-Cross-organization access is forbidden.
+## 12.3 Invitation Permissions
+
+Only users with role `SUPER_ADMIN` may:
+
+- create invitations (POST /api/invitations)
+- resend invitations (PATCH /api/invitations/[id]/resend)
+- revoke invitations (DELETE /api/invitations/[id])
+
+The endpoint to accept an invitation (`POST /api/invitations/accept`) is public (no authentication required) but requires a valid token.
 
 ---
 
@@ -405,7 +426,7 @@ Cross-organization access is forbidden.
 
 All critical API payloads should validate through:
 
-```text id="jlwm08"
+```text
 Zod
 ```
 
@@ -435,6 +456,7 @@ Validate:
 - permissions
 - ownership
 - business rules
+- **invitation token existence and expiration**
 
 ---
 
@@ -488,8 +510,9 @@ when operationally relevant.
 
 Preferred query structure:
 
-```text id="jlwm09"
+```text
 /api/projects?status=active&page=1
+/api/invitations?status=pending&page=1
 ```
 
 ---
@@ -513,7 +536,7 @@ Uploads must validate:
 
 Initially supported:
 
-```text id="jlwm10"
+```text
 images
 pdf
 documents
@@ -574,6 +597,7 @@ Examples:
 - permission changes
 - uploads
 - visibility changes
+- **invitation creation, resend, revocation, acceptance**
 
 ---
 
@@ -664,6 +688,7 @@ Sensitive endpoints should support:
 - throttling
 - abuse prevention
 - upload limits
+- **rate limiting on invitation acceptance to prevent brute force**
 
 when necessary.
 
@@ -685,6 +710,17 @@ Sensitive operations must:
 
 ---
 
+## 22.4 Invitation Token Security
+
+Invitation tokens must be:
+
+- cryptographically random (UUID v4 or similar)
+- single-use
+- expired after 7 days
+- validated server-side
+
+---
+
 # 23. API Versioning Strategy
 
 ---
@@ -699,7 +735,7 @@ Initial internal APIs may avoid explicit versioning.
 
 Public APIs may later adopt:
 
-```text id="jlwm11"
+```text
 /api/v1
 ```
 
@@ -766,7 +802,7 @@ without replacing current standards.
 
 Current phase:
 
-- API standards definition
+- API standards definition (updated for invitation flows)
 
 Next phase:
 

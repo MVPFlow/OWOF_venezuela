@@ -1,8 +1,8 @@
-# `02-system-architecture.md`
+# `01-system-architecture.md`
 
 # System Architecture
 
-# UMAF Social Platform
+# OWOFVzla Social Platform
 
 Version: 0.1
 Status: Draft
@@ -11,7 +11,7 @@ Status: Draft
 
 # 1. Architecture Overview
 
-UMAF Social Platform is designed as a modular, mobile-first, fullstack web platform built around a Progressive Web Application (PWA) architecture.
+OWOFVzla Social Platform is designed as a modular, mobile-first, fullstack web platform built around a Progressive Web Application (PWA) architecture.
 
 The system is structured to support:
 
@@ -39,10 +39,10 @@ The architecture prioritizes:
 │----------------------------------------------│
 │ Landing                                      │
 │ About                                        │
-│ Public Projects                              │
+│ Public Project Landing Pages                 │
 │ Transparency                                 │
 │ Donations                                    │
-│ Login                                         │
+│ Login                                        │
 └──────────────────────┬───────────────────────┘
                        │
                        ▼
@@ -57,6 +57,7 @@ The architecture prioritizes:
 │ Files & Evidence                             │
 │ Reports                                      │
 │ Users & Roles                                │
+│ Invitations (Admin only)                     │
 └──────────────────────┬───────────────────────┘
                        │
                        ▼
@@ -70,6 +71,7 @@ The architecture prioritizes:
 │ Workflows                                    │
 │ Validation                                   │
 │ Audit Logs                                   │
+│ Email Service (Resend)                       │
 └──────────────────────┬───────────────────────┘
                        │
                        ▼
@@ -81,6 +83,7 @@ The architecture prioritizes:
 │ Storage References                           │
 │ Relations                                    │
 │ Activity Logs                                │
+│ Invitations Table                            │
 └──────────────────────────────────────────────┘
 ```
 
@@ -149,7 +152,19 @@ Visual polish is intentionally delayed until later stages.
 
 ---
 
-## 4.4 Modular Expansion
+## 4.4 Single Organization Model (MVP)
+
+The MVP operates with a single pre-seeded organization: **One World One Family Venezuela** (slug: `owofvzla`). No organization creation form is provided. This simplifies the data model while keeping the schema future-ready for multi-organization scenarios.
+
+---
+
+## 4.5 People-Centric with Optional User Accounts
+
+People exist independently from projects. A person may eventually hold a user account (optional 1:1 relationship between `people` and `users`). This enables future sponsor/donor portals where a logged-in person can view their own contributions, beneficiaries, and project history.
+
+---
+
+## 4.6 Modular Expansion
 
 New project types must be supported without major architecture rewrites.
 
@@ -164,7 +179,7 @@ using the same core engine.
 
 ---
 
-## 4.5 Transparency by Design
+## 4.7 Transparency by Design
 
 The architecture must support:
 
@@ -173,6 +188,7 @@ The architecture must support:
 - traceability
 - audit logs
 - public transparency pages
+- public project landing pages
 
 from the beginning.
 
@@ -193,6 +209,7 @@ Components: shadcn/ui
 State: Zustand + React Query
 Forms: React Hook Form
 Validation: Zod
+Email: Resend (for invitations and notifications)
 ```
 
 ---
@@ -256,6 +273,7 @@ Database: PostgreSQL
 ORM: Drizzle ORM
 Authentication: Supabase Auth
 Storage: Supabase Storage
+Email: Resend (via Edge Functions or server actions)
 ```
 
 ---
@@ -272,6 +290,7 @@ The backend handles:
 - audit logs
 - security
 - realtime capabilities
+- email sending (invitations, notifications)
 
 ---
 
@@ -310,9 +329,9 @@ This allows:
 # 7.2 Core Entities
 
 ```text
-Organization
+Organization (single: OWOFVzla)
 Users
-People
+People (with optional user_id → users)
 Projects
 Project Types
 Project Participants
@@ -321,6 +340,7 @@ Payments
 Attachments
 Notes
 Activity Logs
+Invitations
 ```
 
 ---
@@ -381,15 +401,29 @@ Authentication handled through:
 - email/password
 - magic links (future)
 - role-based access
+- **invitation-based registration** (new users are invited by SUPER_ADMIN, not self-registered)
 
 ---
 
-# 9.2 Role System
+# 9.2 User Invitation Flow
+
+Only SUPER_ADMIN can invite new users (COORDINATOR, DIRECTOR, ACCOUNTING, etc.):
+
+1. SUPER_ADMIN creates an invitation via the admin panel (`/admin/users/invite`).
+2. A record is inserted into the `invitations` table with: email, role, token, invited_by, status, expires_at (default 7 days).
+3. An email is sent via **Resend** containing a unique link to accept the invitation.
+4. The invited user clicks the link, sets their password, and activates their account.
+5. The invitation token is marked as used and expires after acceptance.
+6. The new user is created in `users` with `status='active'` and `invited_by` referencing the SUPER_ADMIN.
+
+---
+
+# 9.3 Role System
 
 Initial roles:
 
 ```text
-SUPER_ADMIN
+SUPER_ADMIN (can be assigned to multiple users in the future by existing SUPER_ADMIN)
 DIRECTOR
 COORDINATOR
 VOLUNTEER
@@ -400,7 +434,7 @@ SPONSOR
 
 ---
 
-# 9.3 Authorization Strategy
+# 9.4 Authorization Strategy
 
 Authorization should combine:
 
@@ -489,7 +523,23 @@ Initial domains:
 /reports
 /public
 /settings
+/invitations (admin only)
 ```
+
+---
+
+# 13.1 Public Project Landing Pages
+
+Each project can have a public landing page at `/proyectos/[slug]`. These pages display:
+
+- Project title, description, and cover image
+- Progress and status information
+- Public evidence and attachments
+- Beneficiary summaries (where visibility allows)
+- Sponsor information (if visibility rules allow)
+- Future: fundraising goals, donation buttons, etc.
+
+Public pages are server-rendered for SEO and use the public layout (not the dashboard layout).
 
 ---
 
@@ -558,6 +608,7 @@ Security priorities:
 - audit logs
 - protected routes
 - input validation
+- invitation token security (one-time, expiring)
 
 Sensitive operations must always be server-validated.
 
@@ -575,6 +626,7 @@ Tracked operations:
 - payments
 - uploads
 - role changes
+- invitation creation and acceptance
 
 ---
 
@@ -584,7 +636,7 @@ Performance priorities:
 
 - mobile speed
 - low JS payload
-- server rendering
+- server rendering (especially for public landing pages)
 - lazy loading
 - image optimization
 - incremental fetching
@@ -645,6 +697,7 @@ Testing priorities:
 3. Permissions
 4. Data integrity
 5. Form validation
+6. Invitation flow and email sending
 
 ---
 
@@ -652,9 +705,9 @@ Testing priorities:
 
 The architecture should support future growth including:
 
-- multiple organizations
+- multiple organizations (if ever needed)
 - increased project types
-- sponsor portals
+- sponsor portals (using people→user relationship)
 - analytics
 - public APIs
 - mobile apps
@@ -681,11 +734,11 @@ The goal is pragmatic scalability.
 
 Current phase:
 
-- Blueprint & architecture definition
+- Architecture refinement after decisions
 
 Next phase:
 
-- Database schema design
+- Database schema updates (invitations, people→user FK)
 
 ---
 
@@ -707,6 +760,11 @@ The following decisions have been officially approved for the initial platform v
 - Dynamic/custom field support
 - People-centric relational architecture
 - Phase-based delivery roadmap
+- **Single organization (OWOFVzla) pre-seeded**
+- **Invitation-based user registration (only SUPER_ADMIN can invite)**
+- **Optional 1:1 relationship between people and users (future sponsor portals)**
+- **Public project landing pages per project**
+- **Resend for email delivery (free tier 100 emails/day)**
 
 ---
 
@@ -714,13 +772,13 @@ The following decisions have been officially approved for the initial platform v
 
 The next documentation and planning phases are:
 
-1. Database schema design
-2. Business rules definition
-3. Mobile-first UX guidelines
-4. Core domain specifications
-5. Delivery roadmap definition
+1. Database schema design (add invitations, user_id in people)
+2. Business rules definition (invitation rules, public page rules)
+3. Mobile-first UX guidelines (no major changes)
+4. Core domain specifications (invitations domain)
+5. Delivery roadmap definition (include invitations & public landing pages)
 6. Acceptance criteria per module
-7. Initial wireframes
+7. Initial wireframes (admin invitation panel, public project page)
 8. Repository structure setup
 
 ---

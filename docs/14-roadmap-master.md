@@ -2,7 +2,7 @@
 
 # Master Roadmap
 
-# UMAF Social Platform
+# OWOFVzla Social Platform
 
 Version: 0.1
 Status: Draft
@@ -11,7 +11,7 @@ Status: Draft
 
 # 1. Purpose
 
-This document defines the official development roadmap for the UMAF Social Platform.
+This document defines the official development roadmap for the OWOFVzla Social Platform.
 
 The roadmap establishes:
 
@@ -61,7 +61,7 @@ Each phase should produce:
 
 Priority order:
 
-```text id="jlwm63"
+```text
 1. Functional Stability
 2. Mobile Usability
 3. Security
@@ -79,7 +79,7 @@ Visual polish intentionally comes later.
 
 The roadmap follows:
 
-```text id="jlwm64"
+```text
 Blueprint
 → Architecture
 → Foundation
@@ -102,14 +102,14 @@ Each phase must:
 
 The roadmap is divided into:
 
-```text id="jlwm65"
+```text
 Phase 00 → Foundation
-Phase 01 → Authentication
+Phase 01 → Authentication & Invitations
 Phase 02 → People Module
 Phase 03 → Projects Module
 Phase 04 → Contributions & Payments
 Phase 05 → Files & Evidence
-Phase 06 → Public Portal
+Phase 06 → Public Portal & Landing Pages
 Phase 07 → Reporting & Analytics
 Phase 08 → UX Polish & Optimization
 Phase 09 → Future Expansion
@@ -121,7 +121,7 @@ Phase 09 → Future Expansion
 
 Current project phase:
 
-```text id="jlwm66"
+```text
 Architecture & Documentation
 ```
 
@@ -138,15 +138,15 @@ Current focus:
 
 ---
 
-# Objective
+## Objective
 
 Build the technical and architectural foundation of the platform.
 
 ---
 
-# Includes
+## Includes
 
-```text id="jlwm67"
+```text
 Next.js setup
 TypeScript setup
 TailwindCSS setup
@@ -160,26 +160,30 @@ Navigation foundation
 Environment setup
 GitHub repository setup
 CI baseline
+Seed data:
+  - Organization (OWOFVzla)
+  - SUPER_ADMIN user (Saturno)
 ```
 
 ---
 
-# Deliverables
+## Deliverables
 
-```text id="jlwm68"
+```text
 Working application shell
 Protected routing
 PWA installability
 Responsive mobile layout
 Environment configuration
 Base repository structure
+Pre-seeded organization and super-admin
 ```
 
 ---
 
-# Acceptance Criteria
+## Acceptance Criteria
 
-```text id="jlwm69"
+```text
 Application runs locally
 TypeScript passes
 Authentication scaffold works
@@ -187,23 +191,25 @@ Protected routes work
 PWA installs successfully
 Mobile navigation usable
 Folder structure established
+Seed data loads correctly
 ```
 
 ---
 
-# Testing Requirements
+## Testing Requirements
 
-```text id="jlwm70"
+```text
 TypeScript validation
 Mobile responsive testing
 Basic authentication testing
 PWA validation
 Environment validation
+Seed data verification
 ```
 
 ---
 
-# Technical Notes
+## Technical Notes
 
 Focus on:
 
@@ -218,60 +224,74 @@ Avoid:
 
 ---
 
-# 8. Phase 01 — Authentication
+# 8. Phase 01 — Authentication & Invitations
 
 ---
 
-# Objective
+## Objective
 
-Implement secure authentication and authorization foundations.
+Implement secure authentication and invitation-based user registration.
 
 ---
 
-# Includes
+## Includes
 
-```text id="jlwm71"
+```text
 Login flows
 Session handling
 Protected routes
 Role handling
 Permission middleware
 Supabase Auth integration
-Organization isolation
+Invitation system:
+  - invitations table (token, expires_at, role)
+  - SUPER_ADMIN panel to invite users (email, role)
+  - Email sending via Resend
+  - Public accept-invite page (set password)
+  - Token expiration and single-use validation
+Organization isolation (single org)
 ```
 
 ---
 
-# Deliverables
+## Deliverables
 
-```text id="jlwm72"
+```text
 Secure login system
 Authenticated dashboard access
 Role-aware routing
 Session persistence
+Invitation-only registration flow
+SUPER_ADMIN user management panel
 ```
 
 ---
 
-# Acceptance Criteria
+## Acceptance Criteria
 
-```text id="jlwm73"
-Users can authenticate
+```text
+Users can authenticate (existing users)
+SUPER_ADMIN can create invitations
+Invited user receives email with link
+Invited user can accept, set password, and login
+Expired tokens cannot be used
+Used tokens cannot be reused
+Only SUPER_ADMIN can access invitation panel
 Protected routes enforced
-Unauthorized access blocked
 Role restrictions functional
-Organization isolation working
 ```
 
 ---
 
-# Testing Requirements
+## Testing Requirements
 
-```text id="jlwm74"
+```text
 Authentication testing
-Permission testing
+Invitation creation & acceptance testing
+Token expiration & reuse prevention
+Permission testing (SUPER_ADMIN only)
 RLS validation
-Protected route testing
+Email delivery (Resend) - test with staging keys
 ```
 
 ---
@@ -280,15 +300,15 @@ Protected route testing
 
 ---
 
-# Objective
+## Objective
 
 Build the master people management system.
 
 ---
 
-# Includes
+## Includes
 
-```text id="jlwm75"
+```text
 People CRUD
 Tags
 Search
@@ -297,13 +317,14 @@ Profiles
 Notes
 Attachments
 Mobile forms
+Optional user_id field (reserved for future)
 ```
 
 ---
 
-# Deliverables
+## Deliverables
 
-```text id="jlwm76"
+```text
 Operational people management
 Reusable participant system
 Mobile-friendly workflows
@@ -311,9 +332,9 @@ Mobile-friendly workflows
 
 ---
 
-# Acceptance Criteria
+## Acceptance Criteria
 
-```text id="jlwm77"
+```text
 Create person
 Edit person
 Archive person
@@ -325,9 +346,9 @@ Mobile usability validated
 
 ---
 
-# Testing Requirements
+## Testing Requirements
 
-```text id="jlwm78"
+```text
 CRUD validation
 Duplicate detection testing
 Mobile form testing
@@ -337,7 +358,7 @@ Permission testing
 
 ---
 
-# Technical Notes
+## Technical Notes
 
 Prioritize:
 
@@ -345,35 +366,37 @@ Prioritize:
 - modular forms
 - mobile workflows
 
+The `user_id` field remains unused in this phase (future sponsor portal).
+
 ---
 
 # 10. Phase 03 — Projects Module
 
 ---
 
-# Objective
+## Objective
 
 Implement project management workflows.
 
 ---
 
-# Includes
+## Includes
 
-```text id="jlwm79"
+```text
 Projects CRUD
 Project types
 Participants
 Project statuses
-Visibility rules
+Visibility rules (public, private, internal)
 Timeline support
 Project notes
 ```
 
 ---
 
-# Deliverables
+## Deliverables
 
-```text id="jlwm80"
+```text
 Operational project management
 Participant assignment system
 Project visibility system
@@ -381,22 +404,22 @@ Project visibility system
 
 ---
 
-# Acceptance Criteria
+## Acceptance Criteria
 
-```text id="jlwm81"
+```text
 Create project
 Assign participants
 Change project status
-Public/private visibility works
+Public/private/internal visibility works
 Archive project
 Participant relationships preserved
 ```
 
 ---
 
-# Testing Requirements
+## Testing Requirements
 
-```text id="jlwm82"
+```text
 Project CRUD testing
 Permission validation
 Participant relationship testing
@@ -409,15 +432,15 @@ Visibility testing
 
 ---
 
-# Objective
+## Objective
 
 Implement sponsorship and financial tracking workflows.
 
 ---
 
-# Includes
+## Includes
 
-```text id="jlwm83"
+```text
 Contributions
 Sponsors
 Payments
@@ -428,9 +451,9 @@ Financial timelines
 
 ---
 
-# Deliverables
+## Deliverables
 
-```text id="jlwm84"
+```text
 Operational sponsorship tracking
 Payment registration workflows
 Contribution history visibility
@@ -438,9 +461,9 @@ Contribution history visibility
 
 ---
 
-# Acceptance Criteria
+## Acceptance Criteria
 
-```text id="jlwm85"
+```text
 Create contribution
 Register payment
 Upload receipt
@@ -451,9 +474,9 @@ Maintain audit traceability
 
 ---
 
-# Testing Requirements
+## Testing Requirements
 
-```text id="jlwm86"
+```text
 Payment validation
 Contribution logic testing
 Upload testing
@@ -463,7 +486,7 @@ Audit log validation
 
 ---
 
-# Technical Notes
+## Technical Notes
 
 Financial history must remain:
 
@@ -477,15 +500,15 @@ Financial history must remain:
 
 ---
 
-# Objective
+## Objective
 
 Build centralized evidence and file management workflows.
 
 ---
 
-# Includes
+## Includes
 
-```text id="jlwm87"
+```text
 Uploads
 Evidence galleries
 Mobile camera support
@@ -496,9 +519,9 @@ Upload permissions
 
 ---
 
-# Deliverables
+## Deliverables
 
-```text id="jlwm88"
+```text
 Operational evidence workflows
 Mobile upload support
 Attachment visibility system
@@ -506,9 +529,9 @@ Attachment visibility system
 
 ---
 
-# Acceptance Criteria
+## Acceptance Criteria
 
-```text id="jlwm89"
+```text
 Upload files from mobile
 Preview attachments
 Validate permissions
@@ -518,9 +541,9 @@ Associate evidence correctly
 
 ---
 
-# Testing Requirements
+## Testing Requirements
 
-```text id="jlwm90"
+```text
 Upload validation
 Mobile upload testing
 Permission testing
@@ -529,64 +552,70 @@ File restriction validation
 
 ---
 
-# 13. Phase 06 — Public Portal
+# 13. Phase 06 — Public Portal & Landing Pages
 
 ---
 
-# Objective
+## Objective
 
-Build the public-facing transparency platform.
+Build the public-facing transparency platform, including per-project landing pages.
 
 ---
 
-# Includes
+## Includes
 
-```text id="jlwm91"
-Landing page
+```text
+Landing page (home)
 About page
-Public projects
+Public projects listing
+Public project landing pages (/proyectos/[slug]):
+  - Project title, description, cover image
+  - Status and timeline
+  - Public notes and evidence
+  - Participant summaries (limited)
 Transparency pages
 Public metrics
-Public evidence
 SEO basics
 ```
 
 ---
 
-# Deliverables
+## Deliverables
 
-```text id="分快三92"
+```text
 Operational public portal
-Public project visibility
+Public project visibility with individual landing pages
 Transparency workflows
+SEO-friendly public routes
 ```
 
 ---
 
-# Acceptance Criteria
+## Acceptance Criteria
 
-```text id="分快三93"
-Public projects visible
-Sensitive data protected
-Responsive public pages
-Basic SEO functional
-Public evidence filtered correctly
+```text
+Public projects visible on listing
+Individual project landing pages accessible
+Sensitive data (internal notes, private uploads) never exposed
+Responsive public pages (mobile-first)
+Basic SEO functional (meta tags, sitemap)
+Public evidence filtered correctly (visibility = 'public')
 ```
 
 ---
 
-# Testing Requirements
+## Testing Requirements
 
-```text id="分快三94"
-Visibility testing
-SEO validation
-Responsive testing
-Public data security testing
+```text
+Visibility testing (public vs private)
+SEO validation (meta tags, robots.txt)
+Responsive testing on mobile devices
+Public data security testing (ensure no leaks)
 ```
 
 ---
 
-# Technical Notes
+## Technical Notes
 
 Public pages must NEVER expose:
 
@@ -594,21 +623,23 @@ Public pages must NEVER expose:
 - sensitive financial data
 - restricted uploads
 
+Project landing pages are server-rendered for SEO and caching.
+
 ---
 
 # 14. Phase 07 — Reporting & Analytics
 
 ---
 
-# Objective
+## Objective
 
 Build operational reporting and analytics workflows.
 
 ---
 
-# Includes
+## Includes
 
-```text id="分快三95"
+```text
 Operational dashboards
 Reports
 Metrics
@@ -619,9 +650,9 @@ Project statistics
 
 ---
 
-# Deliverables
+## Deliverables
 
-```text id="分快三96"
+```text
 Operational reporting system
 Basic analytics visibility
 Exportable operational data
@@ -629,9 +660,9 @@ Exportable operational data
 
 ---
 
-# Acceptance Criteria
+## Acceptance Criteria
 
-```text id="分快三97"
+```text
 Generate reports
 Export operational data
 View contribution summaries
@@ -641,9 +672,9 @@ Mobile dashboards usable
 
 ---
 
-# Testing Requirements
+## Testing Requirements
 
-```text id="分快三98"
+```text
 Export testing
 Data consistency validation
 Permission testing
@@ -656,15 +687,15 @@ Dashboard responsiveness testing
 
 ---
 
-# Objective
+## Objective
 
 Improve UI quality, performance, and UX refinement.
 
 ---
 
-# Includes
+## Includes
 
-```text id="分快三99"
+```text
 Branding
 Refined UI
 Animation polish
@@ -676,9 +707,9 @@ Design consistency
 
 ---
 
-# Deliverables
+## Deliverables
 
-```text id="分快三100"
+```text
 Refined production-ready UX
 Improved performance
 Improved accessibility
@@ -686,9 +717,9 @@ Improved accessibility
 
 ---
 
-# Acceptance Criteria
+## Acceptance Criteria
 
-```text id="分快三101"
+```text
 Improved Lighthouse scores
 Consistent UI patterns
 Accessibility improvements validated
@@ -697,9 +728,9 @@ Improved mobile responsiveness
 
 ---
 
-# Testing Requirements
+## Testing Requirements
 
-```text id="分快三102"
+```text
 Performance testing
 Accessibility testing
 Responsive testing
@@ -708,7 +739,7 @@ Regression testing
 
 ---
 
-# Technical Notes
+## Technical Notes
 
 This phase intentionally comes AFTER functional stability.
 
@@ -718,21 +749,22 @@ This phase intentionally comes AFTER functional stability.
 
 ---
 
-# Objective
+## Objective
 
 Support future platform growth.
 
 ---
 
-# Potential Future Modules
+## Potential Future Modules
 
-```text id="分快三103"
-Sponsor portal
+```text
+Sponsor portal (using people→user relationship)
+DIRECTOR ability to invite users (if needed)
 Online donations
-Notifications
-Inventory
+Notifications (email, in-app)
+Inventory management
 Volunteer attendance
-OCR processing
+OCR receipt processing
 Advanced analytics
 WhatsApp integrations
 Native mobile apps
@@ -740,7 +772,7 @@ Native mobile apps
 
 ---
 
-# Notes
+## Notes
 
 Future expansion should:
 
@@ -748,13 +780,15 @@ Future expansion should:
 - preserve modularity
 - avoid major rewrites
 
+The `people.user_id` field (added in Phase 02 but unused) will enable sponsor portal where a person logs in to view their own contributions.
+
 ---
 
 # 17. Cross-Phase Requirements
 
 The following requirements apply to ALL phases:
 
-```text id="分快三104"
+```text
 TypeScript validation
 Mobile-first usability
 Permission validation
@@ -786,7 +820,7 @@ AI-generated work must:
 
 Every AI execution session should append entries to:
 
-```text id="分快三105"
+```text
 /ops/dev-logs.md
 ```
 
@@ -825,7 +859,7 @@ before:
 
 A phase is considered complete only when:
 
-```text id="分快三106"
+```text
 Acceptance criteria pass
 Testing requirements pass
 Documentation updated
@@ -853,7 +887,7 @@ without major architectural rewrites.
 
 Current phase:
 
-- Master roadmap definition complete
+- Master roadmap definition complete (updated with invitations and public landing pages)
 
 Next phase:
 

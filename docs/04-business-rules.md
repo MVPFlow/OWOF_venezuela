@@ -2,7 +2,7 @@
 
 # Business Rules
 
-# UMAF Social Platform
+# OWOFVzla Social Platform
 
 Version: 0.1
 Status: Draft
@@ -11,7 +11,7 @@ Status: Draft
 
 # 1. Purpose
 
-This document defines the official business rules for the UMAF Social Platform.
+This document defines the official business rules for the OWOFVzla Social Platform.
 
 Business rules define:
 
@@ -36,7 +36,13 @@ These rules must be respected across:
 
 ---
 
-## 2.1 People-Centric Model
+## 2.1 Single Organization Model (MVP)
+
+The MVP operates with a single pre-seeded organization: **One World One Family Venezuela** (slug: `owofvzla`). No organization creation UI is provided. All data belongs to this organization. The schema remains future-ready for multi-organization scenarios.
+
+---
+
+## 2.2 People-Centric Model
 
 People exist independently from projects.
 
@@ -47,10 +53,11 @@ A person may:
 - participate in multiple projects
 - have different roles in different projects
 - remain in the system after a project ends
+- optionally have a linked user account (future sponsor/donor portal)
 
 ---
 
-## 2.2 Transparency by Default
+## 2.3 Transparency by Default
 
 All operationally relevant actions should support:
 
@@ -58,12 +65,13 @@ All operationally relevant actions should support:
 - audit logs
 - traceability
 - historical visibility
+- public project landing pages (where visibility allows)
 
 Transparency is considered a core platform principle.
 
 ---
 
-## 2.3 Mobile-First Operations
+## 2.4 Mobile-First Operations
 
 Operational workflows must be optimized for:
 
@@ -74,7 +82,7 @@ Operational workflows must be optimized for:
 
 ---
 
-## 2.4 Functional Simplicity
+## 2.5 Functional Simplicity
 
 The system must prioritize:
 
@@ -91,9 +99,15 @@ Complexity should be avoided whenever possible.
 
 ---
 
-## 3.1 Organization Ownership
+## 3.1 Single Organization
 
-All entities belong to an organization.
+The platform uses exactly one organization: OWOFVzla. This organization is created via seed migration and cannot be created or deleted through the UI.
+
+---
+
+## 3.2 Organization Ownership
+
+All entities belong to this organization.
 
 Every major entity must contain:
 
@@ -101,19 +115,9 @@ Every major entity must contain:
 
 ---
 
-## 3.2 Data Isolation
+## 3.3 Data Isolation (Future)
 
-Organization data must remain isolated.
-
-Users from one organization must never access:
-
-- projects
-- people
-- files
-- reports
-- payments
-
-from another organization.
+If multi-organization support is added later, data must remain isolated. For MVP, isolation is trivial because only one organization exists.
 
 ---
 
@@ -131,11 +135,13 @@ User:
 
 - authenticated account
 - platform access
+- invited by SUPER_ADMIN (no public registration)
 
 Person:
 
 - human record
 - operational entity
+- may optionally link to a user account via `user_id` (future)
 
 A person may exist without a user account.
 
@@ -159,9 +165,10 @@ Allowed user statuses:
 active
 inactive
 suspended
+invited (temporary, before account activation)
 ```
 
-Inactive or suspended users cannot access protected routes.
+Inactive, suspended, or invited users cannot access protected routes.
 
 ---
 
@@ -172,6 +179,20 @@ Every user must have:
 - one primary global role
 
 Additional project-level permissions may exist.
+
+---
+
+## 4.5 Invitation-Only Registration
+
+There is no public sign-up. All new users (COORDINATOR, DIRECTOR, ACCOUNTING, etc.) must be invited by a SUPER_ADMIN.
+
+Invitation flow:
+
+1. SUPER_ADMIN creates invitation (email, role).
+2. System generates a unique one-time token and stores it in `invitations` table.
+3. Resend sends an email with an acceptance link.
+4. User clicks link, sets password, activates account.
+5. Token is marked as used and expires after 7 days.
 
 ---
 
@@ -232,6 +253,12 @@ Historical relationships must be preserved.
 
 ---
 
+## 5.5 Optional User Account Link
+
+A person may have a `user_id` (nullable, 1:1 relationship with `users`). This is reserved for future features (e.g., sponsor portal where a person logs in and views their contributions). During MVP, `user_id` remains NULL.
+
+---
+
 # 6. Project Rules
 
 ---
@@ -240,7 +267,7 @@ Historical relationships must be preserved.
 
 Every project belongs to:
 
-- one organization
+- the single organization
 - one project type
 
 ---
@@ -259,19 +286,34 @@ Definitions:
 
 public:
 
-- visible on public portal
+- visible on public project landing page (`/proyectos/[slug]`)
+- searchable by search engines
 
 private:
 
-- visible only internally
+- visible only internally (dashboard users)
 
 internal:
 
-- restricted operational visibility
+- restricted operational visibility (e.g., sensitive projects)
 
 ---
 
-## 6.3 Project Status
+## 6.3 Public Project Landing Pages
+
+Every project with `visibility = 'public'` MUST have a publicly accessible landing page at `/proyectos/[slug]` displaying:
+
+- title, description, cover image
+- status and timeline
+- public notes and evidence (with `visibility = 'public'`)
+- participant summaries (without sensitive data)
+- future: fundraising goals, donation buttons
+
+These pages are server-rendered for SEO and do not require authentication.
+
+---
+
+## 6.4 Project Status
 
 Allowed project statuses:
 
@@ -284,7 +326,7 @@ archived
 
 ---
 
-## 6.4 Archived Projects
+## 6.5 Archived Projects
 
 Archived projects:
 
@@ -296,7 +338,7 @@ unless explicitly reactivated.
 
 ---
 
-## 6.5 Project Participants
+## 6.6 Project Participants
 
 Projects may contain:
 
@@ -363,12 +405,12 @@ Removing a participant from a project must preserve:
 
 A contribution must belong to:
 
-- one sponsor
+- one sponsor (person)
 - one project
 
 Optional:
 
-- one beneficiary
+- one beneficiary (person)
 
 ---
 
@@ -533,7 +575,7 @@ public
 
 Public notes may appear:
 
-- on public project pages
+- on public project landing pages
 - in transparency sections
 - in impact timelines
 
@@ -561,6 +603,7 @@ Tracked actions include:
 - role changes
 - payment operations
 - uploads
+- invitation creation and acceptance
 
 ---
 
@@ -570,11 +613,39 @@ Activity logs should not be editable by normal users.
 
 ---
 
-# 13. Dynamic Fields Rules
+# 13. Invitation Rules
 
 ---
 
-## 13.1 Dynamic Field Purpose
+## 13.1 Who Can Invite
+
+Only users with role `SUPER_ADMIN` can create invitations. This restriction may be relaxed in the future (e.g., DIRECTOR can invite).
+
+---
+
+## 13.2 Invitation Expiration
+
+Invitations expire after 7 days (configurable). Expired tokens cannot be used. The system should clean up expired invitations periodically or ignore them in validation.
+
+---
+
+## 13.3 One-Time Tokens
+
+Each invitation token is unique and can be used only once. After acceptance or expiration, the token is invalid.
+
+---
+
+## 13.4 Email Delivery
+
+Invitations are sent via Resend (free tier). If email delivery fails, the SUPER_ADMIN is notified and can resend.
+
+---
+
+# 14. Dynamic Fields Rules
+
+---
+
+## 14.1 Dynamic Field Purpose
 
 Dynamic fields exist to:
 
@@ -584,7 +655,7 @@ Dynamic fields exist to:
 
 ---
 
-## 13.2 Dynamic Field Validation
+## 14.2 Dynamic Field Validation
 
 Dynamic fields must support:
 
@@ -594,7 +665,7 @@ Dynamic fields must support:
 
 ---
 
-## 13.3 Dynamic Field Safety
+## 14.3 Dynamic Field Safety
 
 Dynamic fields must never bypass:
 
@@ -604,11 +675,11 @@ Dynamic fields must never bypass:
 
 ---
 
-# 14. Permission Rules
+# 15. Permission Rules
 
 ---
 
-## 14.1 Principle of Least Privilege
+## 15.1 Principle of Least Privilege
 
 Users should only access:
 
@@ -620,7 +691,7 @@ required for their role.
 
 ---
 
-## 14.2 Role Restrictions
+## 15.2 Role Restrictions
 
 Some operations should require elevated permissions.
 
@@ -630,10 +701,11 @@ Examples:
 - managing roles
 - financial adjustments
 - visibility changes
+- creating invitations (SUPER_ADMIN only)
 
 ---
 
-## 14.3 Protected Operations
+## 15.3 Protected Operations
 
 Critical operations must always validate:
 
@@ -645,21 +717,21 @@ server-side.
 
 ---
 
-# 15. Public Portal Rules
+# 16. Public Portal Rules
 
 ---
 
-## 15.1 Public Visibility
+## 16.1 Public Visibility
 
 Only entities marked as public may appear:
 
 - on landing pages
-- in public projects
+- in public project pages
 - in transparency sections
 
 ---
 
-## 15.2 Sensitive Data Protection
+## 16.2 Sensitive Data Protection
 
 The public portal must never expose:
 
@@ -670,11 +742,11 @@ The public portal must never expose:
 
 ---
 
-# 16. Mobile UX Rules
+# 17. Mobile UX Rules
 
 ---
 
-## 16.1 Mobile Priority
+## 17.1 Mobile Priority
 
 All operational flows must be:
 
@@ -685,7 +757,7 @@ All operational flows must be:
 
 ---
 
-## 16.2 Form Complexity
+## 17.2 Form Complexity
 
 Long forms should be avoided.
 
@@ -697,7 +769,7 @@ Preferred approaches:
 
 ---
 
-## 16.3 List Usability
+## 17.3 List Usability
 
 Large desktop tables should be avoided on mobile.
 
@@ -709,11 +781,11 @@ Preferred:
 
 ---
 
-# 17. Data Integrity Rules
+# 18. Data Integrity Rules
 
 ---
 
-## 17.1 Required Timestamps
+## 18.1 Required Timestamps
 
 Major entities must include:
 
@@ -730,13 +802,13 @@ deleted_at
 
 ---
 
-## 17.2 UUID Usage
+## 18.2 UUID Usage
 
 Primary keys should use UUIDs.
 
 ---
 
-## 17.3 Referential Integrity
+## 18.3 Referential Integrity
 
 Relationships must preserve consistency.
 
@@ -744,17 +816,17 @@ Deletion policies should avoid orphaned records.
 
 ---
 
-# 18. Soft Delete Rules
+# 19. Soft Delete Rules
 
 ---
 
-## 18.1 Preferred Deletion Strategy
+## 19.1 Preferred Deletion Strategy
 
 Soft deletes should be preferred over permanent deletion.
 
 ---
 
-## 18.2 Permanent Deletion Restrictions
+## 19.2 Permanent Deletion Restrictions
 
 Permanent deletion should only be available:
 
@@ -763,11 +835,11 @@ Permanent deletion should only be available:
 
 ---
 
-# 19. Reporting Rules
+# 20. Reporting Rules
 
 ---
 
-## 19.1 Historical Accuracy
+## 20.1 Historical Accuracy
 
 Reports must preserve historical accuracy.
 
@@ -779,7 +851,7 @@ Changes to operational data should not silently alter:
 
 ---
 
-## 19.2 Public Metrics
+## 20.2 Public Metrics
 
 Public metrics should prioritize:
 
@@ -789,11 +861,11 @@ Public metrics should prioritize:
 
 ---
 
-# 20. Offline & Resilience Rules
+# 21. Offline & Resilience Rules
 
 ---
 
-## 20.1 Mobile Resilience
+## 21.1 Mobile Resilience
 
 The platform should tolerate:
 
@@ -805,17 +877,17 @@ whenever possible.
 
 ---
 
-# 21. Security Rules
+# 22. Security Rules
 
 ---
 
-## 21.1 Server-Side Validation
+## 22.1 Server-Side Validation
 
 Critical validations must never rely exclusively on frontend validation.
 
 ---
 
-## 21.2 File Protection
+## 22.2 File Protection
 
 Protected uploads must require:
 
@@ -825,7 +897,7 @@ Protected uploads must require:
 
 ---
 
-## 21.3 Sensitive Operations
+## 22.3 Sensitive Operations
 
 Sensitive operations must always generate:
 
@@ -835,14 +907,25 @@ Sensitive operations must always generate:
 
 ---
 
-# 22. Future Expansion Rules
+## 22.4 Invitation Token Security
+
+Invitation tokens must be:
+
+- cryptographically random
+- stored hashed or as plain UUID (with proper DB constraints)
+- expired after 7 days
+- invalidated after use
+
+---
+
+# 23. Future Expansion Rules
 
 The architecture must remain compatible with future modules:
 
 - donations
 - inventory
 - notifications
-- sponsor portals
+- sponsor portals (using people→user link)
 - volunteer management
 - analytics
 - event systems
@@ -851,7 +934,7 @@ without major rewrites.
 
 ---
 
-# 23. Explicit Non-Goals
+# 24. Explicit Non-Goals
 
 The initial business rules do NOT attempt to support:
 
@@ -863,12 +946,12 @@ The initial business rules do NOT attempt to support:
 
 ---
 
-# 24. Current Status
+# 25. Current Status
 
 Current phase:
 
-- Business rules definition
+- Business rules definition (updated for invitations, public landing pages, single org)
 
 Next phase:
 
-- User roles & permissions definition
+- User roles & permissions definition (add invitation permissions)

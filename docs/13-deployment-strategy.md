@@ -2,7 +2,7 @@
 
 # Deployment Strategy
 
-# UMAF Social Platform
+# OWOFVzla Social Platform
 
 Version: 0.1
 Status: Draft
@@ -11,7 +11,7 @@ Status: Draft
 
 # 1. Purpose
 
-This document defines the official deployment and environment strategy for the UMAF Social Platform.
+This document defines the official deployment and environment strategy for the OWOFVzla Social Platform.
 
 The deployment architecture prioritizes:
 
@@ -55,7 +55,7 @@ Infrastructure decisions should:
 
 Initial infrastructure stack:
 
-```text id="jlwm50"
+```text
 Frontend:
 Vercel
 
@@ -68,6 +68,9 @@ PostgreSQL (Supabase)
 Storage:
 Supabase Storage
 
+Email Service:
+Resend
+
 Version Control:
 GitHub
 ```
@@ -78,7 +81,7 @@ GitHub
 
 The platform uses isolated environments:
 
-```text id="jlwm51"
+```text
 development
 staging
 production
@@ -122,6 +125,8 @@ Characteristics:
 - safer validation
 - controlled testing
 
+**Note**: Staging should use a separate Supabase project and Resend test API keys to avoid sending real emails to actual users.
+
 ---
 
 ## 5.3 Production
@@ -149,7 +154,7 @@ Characteristics:
 
 Official frontend platform:
 
-```text id="jlwm52"
+```text
 Vercel
 ```
 
@@ -177,6 +182,8 @@ Every feature branch may generate:
 
 when operationally useful.
 
+**Important**: Preview deployments must have their own environment variables, including `RESEND_API_KEY` (test key) to test invitation emails without affecting production.
+
 ---
 
 # 7. Backend Deployment Strategy
@@ -187,7 +194,7 @@ when operationally useful.
 
 Official backend platform:
 
-```text id="jlwm53"
+```text
 Supabase
 ```
 
@@ -223,13 +230,15 @@ Each environment should maintain isolated databases whenever possible.
 
 Avoid shared production/development databases.
 
+**Recommendation**: Use separate Supabase projects for dev, staging, and production.
+
 ---
 
 ## 8.2 Migration Strategy
 
 Database changes should occur through:
 
-- tracked migrations
+- tracked migrations (Drizzle)
 - reviewed schema changes
 - version-controlled database evolution
 
@@ -253,7 +262,7 @@ Schema migrations should remain:
 
 Protected branches:
 
-```text id="jlwm54"
+```text
 main
 master
 ```
@@ -268,16 +277,17 @@ Development must occur through dedicated branches.
 
 Branch naming:
 
-```text id="jlwm55"
+```text
 dev-[task]-[date]
 ai-[task]-[date]
 ```
 
 Examples:
 
-```text id="jlwm56"
+```text
 dev-auth-system-2026-05-21
 ai-people-module-2026-05-21
+ai-invitations-flow-2026-05-28
 ```
 
 ---
@@ -305,7 +315,7 @@ GitHub Actions should remain lightweight initially.
 
 Recommended CI tasks:
 
-```text id="jlwm57"
+```text
 TypeScript validation
 Linting
 Unit tests
@@ -341,7 +351,7 @@ Avoid premature DevOps complexity.
 
 Recommended initial workflows:
 
-```text id="jlwm58"
+```text
 lint.yml
 typecheck.yml
 unit-tests.yml
@@ -353,7 +363,7 @@ unit-tests.yml
 
 Suggested behavior:
 
-```text id="jlwm59"
+```text
 feature branches → preview deployments
 main → production deployment
 ```
@@ -373,13 +383,29 @@ Secrets must ONLY exist in:
 
 Never hardcode secrets.
 
+Required variables for production:
+
+```env
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=...
+NEXT_PUBLIC_SUPABASE_ANON_KEY=...
+SUPABASE_SERVICE_ROLE_KEY=...
+
+# Resend
+RESEND_API_KEY=re_xxxxx
+EMAIL_FROM=noreply@owofvzla.org
+
+# App
+NEXT_PUBLIC_APP_URL=https://app.owofvzla.org
+```
+
 ---
 
 ## 12.2 Public Variables
 
 Only public-safe variables may use:
 
-```text id="jlwm60"
+```text
 NEXT_PUBLIC_
 ```
 
@@ -417,7 +443,7 @@ Expose only infrastructure that is operationally necessary.
 Production deployments should validate:
 
 - environment correctness
-- secret availability
+- secret availability (especially Resend API key)
 - migration integrity
 
 before release.
@@ -479,11 +505,13 @@ without explicit approval.
 
 Initial monitoring stack:
 
-```text id="jlwm61"
+```text
 Vercel Analytics
 Supabase Logs
 Console Logging
 ```
+
+**Email monitoring**: Resend provides delivery logs and open/click tracking.
 
 ---
 
@@ -520,7 +548,7 @@ when appropriate.
 
 AI execution sessions should append entries to:
 
-```text id="jlwm62"
+```text
 /ops/dev-logs.md
 ```
 
@@ -580,6 +608,7 @@ Critical checks:
 - uploads
 - navigation
 - touch interactions
+- **invitation acceptance flow on mobile**
 
 ---
 
@@ -643,6 +672,7 @@ Critical assets:
 - database
 - uploads
 - environment configuration
+- **invitation tokens table** (though tokens are short-lived)
 
 should support recovery planning.
 
@@ -691,7 +721,7 @@ depending on platform growth.
 
 Current phase:
 
-- Deployment strategy definition
+- Deployment strategy definition (updated for email service and invitation flow)
 
 Next phase:
 

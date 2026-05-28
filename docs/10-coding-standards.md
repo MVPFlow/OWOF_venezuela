@@ -2,7 +2,7 @@
 
 # Coding Standards
 
-# UMAF Social Platform
+# OWOFVzla Social Platform
 
 Version: 0.1
 Status: Draft
@@ -11,7 +11,7 @@ Status: Draft
 
 # 1. Purpose
 
-This document defines the official coding standards for the UMAF Social Platform.
+This document defines the official coding standards for the OWOFVzla Social Platform.
 
 The standards prioritize:
 
@@ -132,7 +132,7 @@ before:
 
 The entire codebase must use:
 
-```text id="jlwm17"
+```text
 TypeScript
 ```
 
@@ -174,7 +174,7 @@ Avoid duplicated type definitions.
 
 The minimum required validation for AI-generated code is:
 
-```text id="jlwm18"
+```text
 tsc
 ```
 
@@ -210,7 +210,7 @@ Heavy pipelines should remain local unless future architecture decisions change 
 
 The following branches must remain protected:
 
-```text id="jlwm19"
+```text
 main
 master
 ```
@@ -225,16 +225,17 @@ All work must occur through dedicated branches.
 
 Branch naming conventions:
 
-```text id="jlwm20"
+```text
 dev-[task]-[date]
 ai-[task]-[date]
 ```
 
 Examples:
 
-```text id="jlwm21"
+```text
 dev-auth-module-2026-05-21
 ai-people-crud-2026-05-21
+ai-invitations-flow-2026-05-28
 ```
 
 ---
@@ -260,7 +261,7 @@ Avoid giant PRs.
 
 The following are forbidden unless explicitly approved:
 
-```text id="jlwm22"
+```text
 dangerouslySetInnerHTML
 raw SQL concatenation
 eval
@@ -296,7 +297,32 @@ server-side.
 
 ---
 
-## 7.4 Dependency Security
+## 7.4 Invitation Token Security
+
+Invitation tokens must be:
+
+- cryptographically random (UUID v4 or secure random)
+- stored in the `invitations` table with a unique constraint
+- single-use (marked as `used_at` after acceptance)
+- expired after a configurable period (default 7 days)
+- validated server-side before user creation
+
+Never expose tokens in URLs logged or sent to third parties.
+
+---
+
+## 7.5 Email Security
+
+When sending invitation emails via Resend:
+
+- never expose the token in plain text in logs
+- ensure the email content is sanitized
+- use a verified sending domain
+- include clear instructions and expiration warning
+
+---
+
+## 7.6 Dependency Security
 
 Do not install packages that:
 
@@ -374,7 +400,7 @@ If a component becomes tightly coupled to business logic:
 
 Components or modules should not exceed:
 
-```text id="jlwm23"
+```text
 500 lines
 ```
 
@@ -423,15 +449,18 @@ Use explicit names.
 
 Good examples:
 
-```text id="jlwm24"
+```text
 createPayment
 archiveProject
 validateSponsorAccess
+inviteUser
+acceptInvitation
+resendInvitation
 ```
 
 Avoid vague names:
 
-```text id="jlwm25"
+```text
 handleData
 processStuff
 runLogic
@@ -557,12 +586,13 @@ Avoid hardcoding values inside components.
 
 Examples of extracted constants:
 
-```text id="jlwm26"
+```text
 roles
 statuses
 navigation items
 upload limits
 feature flags
+invitation_expiration_days
 ```
 
 ---
@@ -577,7 +607,7 @@ Validation schemas should remain centralized.
 
 Preferred approach:
 
-```text id="jlwm27"
+```text
 Zod Schemas
 ```
 
@@ -630,7 +660,7 @@ Unexpected failures should:
 
 Every AI execution session must append an entry to:
 
-```text id="jlwm28"
+```text
 /ops/dev-logs.md
 ```
 
@@ -653,22 +683,22 @@ Each log entry should include:
 ## 17.3 Example Entry
 
 ```md
-## 2026-05-21 14:30 UTC
+## 2026-05-28 10:00 UTC
 
 Task:
 
-- Implemented people CRUD module
+- Implemented invitation creation and acceptance flow
 
 Affected:
 
-- people domain
-- validators
-- mobile forms
+- invitations domain
+- email service (Resend)
+- auth domain
 
 Notes:
 
-- Added temporary upload placeholder
-- Pending optimization for image compression
+- Added token expiration logic (7 days)
+- Pending resend invitation UI
 ```
 
 ---
@@ -761,7 +791,7 @@ If a file grows excessively:
 
 Preferred import order:
 
-```text id="jlwm29"
+```text
 1. External libraries
 2. Shared packages
 3. Internal domains
@@ -902,7 +932,7 @@ Future standards may include:
 
 Current phase:
 
-- Coding standards definition
+- Coding standards definition (updated for invitations and email)
 
 Next phase:
 

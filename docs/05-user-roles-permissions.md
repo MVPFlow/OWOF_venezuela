@@ -2,7 +2,7 @@
 
 # User Roles & Permissions
 
-# UMAF Social Platform
+# OWOFVzla Social Platform
 
 Version: 0.1
 Status: Draft
@@ -11,7 +11,7 @@ Status: Draft
 
 # 1. Purpose
 
-This document defines the official user roles, permission model, and access control strategy for the UMAF Social Platform.
+This document defines the official user roles, permission model, and access control strategy for the OWOFVzla Social Platform.
 
 The permission system must guarantee:
 
@@ -66,11 +66,9 @@ required for their responsibilities.
 
 ---
 
-## 3.2 Organization Isolation
+## 3.2 Single Organization (MVP)
 
-Users may only access data belonging to their organization.
-
-Cross-organization access is forbidden unless explicitly implemented in future administrative systems.
+The MVP operates with a single pre-seeded organization: **One World One Family Venezuela** (slug: `owofvzla`). All users belong to this organization. Cross-organization access is not applicable.
 
 ---
 
@@ -102,6 +100,8 @@ Global Roles
 Project Context Roles
 ```
 
+**Registration is invitation-only**. There is no public sign-up.
+
 ---
 
 # 5. Global Roles
@@ -126,25 +126,21 @@ SPONSOR
 
 Highest permission level.
 
----
-
 ## Responsibilities
 
 - full platform administration
-- user management
+- user management (invite, promote, suspend)
 - permission management
-- organization configuration
 - system-wide operations
-
----
+- **can assign other users to SUPER_ADMIN role in the future**
 
 ## Allowed Actions
 
 ```text
 Full access to all modules
-Create users
+Invite new users (send invitation emails)
 Delete users
-Assign roles
+Assign/change roles (including promotion to SUPER_ADMIN)
 Manage settings
 Manage visibility
 View all reports
@@ -153,11 +149,9 @@ Manage financial records
 Access audit logs
 ```
 
----
-
 ## Restrictions
 
-None inside organization scope.
+None inside the organization scope.
 
 ---
 
@@ -165,16 +159,12 @@ None inside organization scope.
 
 Strategic organizational management role.
 
----
-
 ## Responsibilities
 
 - supervise operations
 - review projects
 - monitor transparency
 - approve sensitive operations
-
----
 
 ## Allowed Actions
 
@@ -188,23 +178,19 @@ View audit logs
 Approve visibility changes
 ```
 
----
-
 ## Restrictions
 
 Cannot:
 
+- manage users (invite, delete, change roles) – only SUPER_ADMIN can do that initially
 - manage system infrastructure
 - delete super admins
-- bypass organization security
 
 ---
 
 # 8. COORDINATOR
 
 Operational management role.
-
----
 
 ## Responsibilities
 
@@ -213,8 +199,6 @@ Operational management role.
 - manage projects
 - upload evidence
 - oversee workflows
-
----
 
 ## Allowed Actions
 
@@ -229,14 +213,12 @@ Manage contributions
 Manage payments
 ```
 
----
-
 ## Restrictions
 
 Cannot:
 
 - manage global settings
-- manage high-level permissions
+- manage users or permissions
 - access restricted audit data
 
 ---
@@ -245,15 +227,11 @@ Cannot:
 
 Limited operational role.
 
----
-
 ## Responsibilities
 
 - field participation
 - operational support
 - evidence uploads
-
----
 
 ## Allowed Actions
 
@@ -264,8 +242,6 @@ Create operational notes
 View assigned participants
 Update limited operational data
 ```
-
----
 
 ## Restrictions
 
@@ -283,15 +259,11 @@ Cannot:
 
 Financial operations role.
 
----
-
 ## Responsibilities
 
 - contribution tracking
 - payment management
 - financial verification
-
----
 
 ## Allowed Actions
 
@@ -303,8 +275,6 @@ Upload receipts
 View financial reports
 Export financial data
 ```
-
----
 
 ## Restrictions
 
@@ -320,15 +290,11 @@ Cannot:
 
 Read-only role.
 
----
-
 ## Responsibilities
 
 - monitoring
 - supervision
 - transparency review
-
----
 
 ## Allowed Actions
 
@@ -338,8 +304,6 @@ View reports
 View public operational data
 View participants
 ```
-
----
 
 ## Restrictions
 
@@ -354,19 +318,13 @@ Cannot:
 
 # 12. SPONSOR
 
-External or limited-access sponsor role.
-
-Optional future-facing role.
-
----
+External or limited-access sponsor role. Optional future-facing role.
 
 ## Responsibilities
 
 - review sponsorship information
 - view contribution history
-- access sponsor portal
-
----
+- access sponsor portal (future)
 
 ## Allowed Actions
 
@@ -376,8 +334,6 @@ View assigned beneficiaries
 View public evidence
 View sponsor reports
 ```
-
----
 
 ## Restrictions
 
@@ -396,7 +352,7 @@ Projects may define contextual roles independent of global roles.
 
 Examples:
 
-```text id="x9qj4d"
+```text
 student
 beneficiary
 doctor
@@ -417,7 +373,7 @@ Project-level roles:
 
 Example:
 
-```text id="5n76ko"
+```text
 Jose:
 Global Role → VOLUNTEER
 
@@ -431,7 +387,7 @@ Project B Role → sponsor
 
 Permissions should be grouped into categories:
 
-```text id="ndf7hs"
+```text
 read
 create
 update
@@ -439,6 +395,7 @@ delete
 approve
 export
 manage
+invite (users) → only SUPER_ADMIN
 ```
 
 ---
@@ -447,7 +404,7 @@ manage
 
 ---
 
-# 16.1 Dashboard
+## 16.1 Dashboard
 
 | Role        | Access  |
 | ----------- | ------- |
@@ -461,7 +418,7 @@ manage
 
 ---
 
-# 16.2 People Module
+## 16.2 People Module
 
 | Role        | Access  |
 | ----------- | ------- |
@@ -475,21 +432,21 @@ manage
 
 ---
 
-# 16.3 Projects Module
+## 16.3 Projects Module
 
-| Role        | Access        |
-| ----------- | ------------- |
-| SUPER_ADMIN | Full          |
-| DIRECTOR    | Full          |
-| COORDINATOR | Full          |
-| VOLUNTEER   | Assigned Only |
-| ACCOUNTING  | Read          |
-| VIEWER      | Read          |
-| SPONSOR     | Limited       |
+| Role        | Access                         |
+| ----------- | ------------------------------ |
+| SUPER_ADMIN | Full                           |
+| DIRECTOR    | Full                           |
+| COORDINATOR | Full                           |
+| VOLUNTEER   | Assigned Only                  |
+| ACCOUNTING  | Read                           |
+| VIEWER      | Read                           |
+| SPONSOR     | Limited (public projects only) |
 
 ---
 
-# 16.4 Contributions & Payments
+## 16.4 Contributions & Payments
 
 | Role        | Access        |
 | ----------- | ------------- |
@@ -503,17 +460,19 @@ manage
 
 ---
 
-# 16.5 Users & Permissions
+## 16.5 Users & Permissions (including Invitations)
 
-| Role        | Access  |
-| ----------- | ------- |
-| SUPER_ADMIN | Full    |
-| DIRECTOR    | Limited |
-| COORDINATOR | None    |
-| VOLUNTEER   | None    |
-| ACCOUNTING  | None    |
-| VIEWER      | None    |
-| SPONSOR     | None    |
+| Role        | Access                           |
+| ----------- | -------------------------------- |
+| SUPER_ADMIN | Full (invite, delete, promote)   |
+| DIRECTOR    | None (read-only user list maybe) |
+| COORDINATOR | None                             |
+| VOLUNTEER   | None                             |
+| ACCOUNTING  | None                             |
+| VIEWER      | None                             |
+| SPONSOR     | None                             |
+
+**Note**: Only SUPER_ADMIN can invite new users, resend invitations, and revoke invitations. This restriction may be relaxed in the future for DIRECTOR, but not for MVP.
 
 ---
 
@@ -522,15 +481,16 @@ manage
 The following operations are considered sensitive:
 
 - deleting records
-- changing permissions
+- changing permissions (including promoting to SUPER_ADMIN)
 - visibility changes
 - financial adjustments
 - restoring archived records
 - exporting sensitive data
+- **creating or revoking user invitations**
 
 These actions require:
 
-- elevated permissions
+- elevated permissions (SUPER_ADMIN for invitations)
 - server validation
 - audit logs
 
@@ -538,9 +498,9 @@ These actions require:
 
 # 18. Public Visibility Rules
 
-Public users should only access:
+Public users (non-authenticated) should only access:
 
-- public projects
+- public project landing pages
 - public notes
 - approved evidence
 - public reports
@@ -569,11 +529,12 @@ Only elevated roles should access:
 - full activity logs
 - permission history
 - sensitive operational changes
+- invitation logs
 
 Recommended roles:
 
 - SUPER_ADMIN
-- DIRECTOR
+- DIRECTOR (may have limited audit view)
 
 ---
 
@@ -581,7 +542,7 @@ Recommended roles:
 
 Supabase RLS should enforce:
 
-- organization ownership
+- organization ownership (only OWOFVzla data)
 - role restrictions
 - entity ownership
 - project visibility
@@ -609,7 +570,7 @@ Every protected endpoint must validate:
 
 ```text
 authentication
-organization ownership
+organization ownership (implicitly OWOFVzla)
 role permissions
 resource permissions
 ```
@@ -649,6 +610,7 @@ Future versions may support:
 - temporary access
 - approval workflows
 - multi-organization administration
+- allowing DIRECTOR to invite users
 
 without replacing the current architecture.
 
@@ -671,7 +633,7 @@ The goal is operational simplicity.
 
 Current phase:
 
-- Roles & permission definition
+- Roles & permission definition (updated for invitation-only, single SUPER_ADMIN, future promotion)
 
 Next phase:
 
