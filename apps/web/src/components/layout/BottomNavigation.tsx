@@ -1,13 +1,7 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import {
-  Home,
-  Users,
-  Folder,
-  Settings,
-  type LucideIcon,
-} from "lucide-react";
+import { Home, Users, Folder, Settings, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface NavItem {
@@ -18,9 +12,9 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { label: "Inicio", href: "/dashboard", icon: Home },
-  { label: "Personas", href: "/dashboard/personas", icon: Users },
-  { label: "Proyectos", href: "/dashboard/proyectos", icon: Folder },
-  { label: "Ajustes", href: "/dashboard/ajustes", icon: Settings },
+  { label: "Personas", href: "/dashboard/people", icon: Users },
+  { label: "Proyectos", href: "/dashboard/projects", icon: Folder },
+  { label: "Ajustes", href: "/dashboard/settings", icon: Settings },
 ];
 
 export function BottomNavigation() {
@@ -47,22 +41,19 @@ export function BottomNavigation() {
                   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                   isActive
                     ? "text-primary"
-                    : "text-muted-foreground hover:text-foreground"
+                    : "text-muted-foreground hover:text-foreground",
                 )}
                 aria-current={isActive ? "page" : undefined}
                 aria-label={item.label}
               >
                 <Icon
-                  className={cn(
-                    "h-5 w-5",
-                    isActive && "fill-primary/10"
-                  )}
+                  className={cn("h-5 w-5", isActive && "fill-primary/10")}
                   aria-hidden="true"
                 />
                 <span
                   className={cn(
                     "text-[10px] font-medium leading-tight",
-                    isActive && "font-semibold"
+                    isActive && "font-semibold",
                   )}
                 >
                   {item.label}
