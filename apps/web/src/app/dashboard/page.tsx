@@ -151,22 +151,22 @@ export default async function DashboardPage() {
             {
               label: "Nueva persona",
               description: "Registrar miembro",
-              href: "/dashboard/personas/nueva",
+              href: "/dashboard/people/new",
             },
             {
               label: "Nuevo proyecto",
               description: "Crear proyecto",
-              href: "/dashboard/proyectos/nuevo",
+              href: "/dashboard/projects",
             },
             {
               label: "Ver reportes",
               description: "Estadísticas",
-              href: "/dashboard/reportes",
+              href: "/dashboard/reports",
             },
             {
               label: "Configuración",
               description: "Ajustes",
-              href: "/dashboard/ajustes",
+              href: "/dashboard/settings",
             },
           ].map((action) => (
             <a

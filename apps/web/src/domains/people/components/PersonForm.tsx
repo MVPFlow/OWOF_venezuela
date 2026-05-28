@@ -33,21 +33,22 @@ export function PersonForm({
   });
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      {/* First Name */}
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
       <div className="space-y-2">
         <label
           htmlFor="first_name"
-          className="block text-sm font-medium text-foreground"
+          className="text-sm font-medium text-foreground"
         >
           Nombre <span className="text-destructive">*</span>
         </label>
         <input
           id="first_name"
           type="text"
+          autoComplete="given-name"
+          inputMode="text"
           {...register("first_name")}
-          className="block w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:cursor-not-allowed disabled:opacity-50"
-          placeholder="Ej: Juan"
+          className="block w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:cursor-not-allowed disabled:opacity-50"
+          placeholder="Juan"
           disabled={isSubmitting}
         />
         {errors.first_name && (
@@ -55,20 +56,21 @@ export function PersonForm({
         )}
       </div>
 
-      {/* Last Name */}
       <div className="space-y-2">
         <label
           htmlFor="last_name"
-          className="block text-sm font-medium text-foreground"
+          className="text-sm font-medium text-foreground"
         >
           Apellido <span className="text-destructive">*</span>
         </label>
         <input
           id="last_name"
           type="text"
+          autoComplete="family-name"
+          inputMode="text"
           {...register("last_name")}
-          className="block w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:cursor-not-allowed disabled:opacity-50"
-          placeholder="Ej: Pérez"
+          className="block w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:cursor-not-allowed disabled:opacity-50"
+          placeholder="Pérez"
           disabled={isSubmitting}
         />
         {errors.last_name && (
@@ -76,20 +78,21 @@ export function PersonForm({
         )}
       </div>
 
-      {/* Email */}
       <div className="space-y-2">
         <label
           htmlFor="email"
-          className="block text-sm font-medium text-foreground"
+          className="text-sm font-medium text-foreground"
         >
           Correo electrónico
         </label>
         <input
           id="email"
           type="email"
+          autoComplete="email"
+          inputMode="email"
           {...register("email")}
-          className="block w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:cursor-not-allowed disabled:opacity-50"
-          placeholder="ej: juan@ejemplo.com"
+          className="block w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:cursor-not-allowed disabled:opacity-50"
+          placeholder="juan@ejemplo.com"
           disabled={isSubmitting}
         />
         {errors.email && (
@@ -97,20 +100,21 @@ export function PersonForm({
         )}
       </div>
 
-      {/* Phone */}
       <div className="space-y-2">
         <label
           htmlFor="phone"
-          className="block text-sm font-medium text-foreground"
+          className="text-sm font-medium text-foreground"
         >
           Teléfono
         </label>
         <input
           id="phone"
           type="tel"
+          autoComplete="tel"
+          inputMode="numeric"
           {...register("phone")}
-          className="block w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:cursor-not-allowed disabled:opacity-50"
-          placeholder="Ej: +52 55 1234 5678"
+          className="block w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:cursor-not-allowed disabled:opacity-50"
+          placeholder="+58 412 123 4567"
           disabled={isSubmitting}
         />
         {errors.phone && (
@@ -118,11 +122,10 @@ export function PersonForm({
         )}
       </div>
 
-      {/* Submit Button */}
       <button
         type="submit"
         disabled={isSubmitting}
-        className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+        className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 min-h-[44px]"
       >
         {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
         {initialData ? "Actualizar persona" : "Crear persona"}

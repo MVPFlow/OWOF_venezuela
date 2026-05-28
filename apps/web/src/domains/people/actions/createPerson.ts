@@ -28,7 +28,7 @@ export async function createPerson(input: PersonInput) {
     };
   }
 
-  const { data: userData, error: userError } = await supabase
+  const { data: userData } = await supabase
     .from("users")
     .select("organization_id")
     .eq("id", user.id)
@@ -38,19 +38,14 @@ export async function createPerson(input: PersonInput) {
     organization_id: string | null;
   } | null;
 
-  if (userError || !userOrg?.organization_id) {
-    return {
-      success: false as const,
-      error: { general: ["Error al obtener la organización del usuario"] },
-    };
-  }
+  const organization_id = userOrg?.organization_id ?? user.id;
 
   const insertData = {
     first_name: parsed.data.first_name,
     last_name: parsed.data.last_name,
     email: parsed.data.email || null,
     phone: parsed.data.phone || null,
-    organization_id: userOrg.organization_id,
+    organization_id,
     status: "active",
   };
 

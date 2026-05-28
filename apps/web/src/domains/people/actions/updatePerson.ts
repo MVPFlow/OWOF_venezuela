@@ -42,12 +42,7 @@ export async function updatePerson(input: UpdatePersonInput) {
     organization_id: string | null;
   } | null;
 
-  if (!userOrg?.organization_id) {
-    return {
-      success: false as const,
-      error: { general: ["Error al obtener la organización del usuario"] },
-    };
-  }
+  const organization_id = userOrg?.organization_id ?? user.id;
 
   const { data: existingPerson } = await supabase
     .from("people")
@@ -66,7 +61,7 @@ export async function updatePerson(input: UpdatePersonInput) {
     };
   }
 
-  if (existingOrg.organization_id !== userOrg.organization_id) {
+  if (existingOrg.organization_id !== organization_id) {
     return {
       success: false as const,
       error: { general: ["No tienes permiso para editar esta persona"] },

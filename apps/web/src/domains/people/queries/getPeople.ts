@@ -25,14 +25,12 @@ export async function getPeople(): Promise<Person[]> {
     organization_id: string | null;
   } | null;
 
-  if (!userOrg?.organization_id) {
-    return [];
-  }
+  const organization_id = userOrg?.organization_id ?? user.id;
 
   const { data, error } = await supabase
     .from("people")
     .select("*")
-    .eq("organization_id", userOrg.organization_id)
+    .eq("organization_id", organization_id)
     .eq("status", "active")
     .order("created_at", { ascending: false });
 
