@@ -2,35 +2,44 @@
 
 ## Estado actual
 
-- Base de datos: tablas `organizations`, `users`, `people`, `projects`, `project_participants` creadas. Faltan muchas.
+- **Paquete `@owofvzla/db` listo**: Drizzle ORM configurado, `schema.ts` completo (16 tablas + relaciones + enums), migraciones generadas, seed implementado.
+- **Pendiente**: aplicar migraciones a Supabase y ejecutar seed (requiere conexión a base de datos real).
 - Código: People module parcial (CRUD), auth básico (login/register), pero sin invitaciones.
 - Errores críticos de TS resueltos recientemente.
 
-## Prioridad 1: Base de datos y semillas (completar Phase 00/01)
+## Prioridad 1: Base de datos y semillas (Phase 00/01)
 
-- [ ] **Definir esquema Drizzle completo** según `03-database-schema-v1.md` (incluir todas las tablas faltantes: `invitations`, `project_types`, `contributions`, `payments`, `attachments`, `notes`, `activity_logs`, `person_tags`, `people_tags_relations`, `custom_field_definitions`, `custom_field_values`).
-- [ ] **Generar migraciones** con Drizzle y aplicar a Supabase (crear tablas).
-- [ ] **Crear seed**:
-  - Organización: `OWOFVzla` (id fijo, slug `owofvzla`).
-  - Usuario SUPER_ADMIN: `Saturno Mangieri` (email a definir, role SUPER_ADMIN, status active).
-  - Tipos de proyecto básicos: `scholarship`, `medical`, `food`, `emergency`.
-- [ ] **Verificar RLS** - habilitar en todas las tablas, crear políticas básicas (al menos para `users`, `people`, `projects`).
+### Completado (código listo, pendiente de aplicar)
 
-## Prioridad 2: Sistema de invitaciones (Phase 01 completada)
+- [x] **Definir esquema Drizzle completo** según `03-database-schema-v1.md` (16 tablas: `organizations`, `users`, `people`, `projects`, `project_types`, `project_participants`, `contributions`, `payments`, `attachments`, `notes`, `activity_logs`, `invitations`, `person_tags`, `people_tags_relations`, `custom_field_definitions`, `custom_field_values`).
+- [x] **Generar migraciones** con Drizzle (`0000_tired_maverick.sql` para tablas).
+- [x] **Crear seed**: organización (OWOFVzla, id fijo), SUPER_ADMIN (via .env), tipos de proyecto (scholarship, medical, food, emergency).
+- [x] **Políticas RLS** generadas (`0001_rls_policies.sql`) para todas las tablas.
+- [x] **Configurar Drizzle en monorepo**: paquete `@owofvzla/db` con scripts npm, tsconfig, drizzle.config.ts.
+- [x] **Variables de entorno actualizadas** (`.env.example`): nuevas API keys de Supabase, seed configurable.
 
-- [ ] Implementar tabla `invitations` (ya incluida en migraciones).
+### Pendiente de ejecutar (requiere base de datos real)
+
+- [ ] **Aplicar migraciones a Supabase** — ejecutar `0000_tired_maverick.sql` (crear tablas) y `0001_rls_policies.sql` (RLS) en el SQL Editor de Supabase, o usar `pnpm db:migrate`.
+- [ ] **Ejecutar seed** con `pnpm db:seed` (requiere `SUPABASE_DATABASE_URL` y variables de SUPER_ADMIN en `.env`).
+- [ ] **Verificar en Supabase**: 16 tablas creadas, SUPER_ADMIN en `users`, persona vinculada en `people`, 4 tipos de proyecto en `project_types`.
+
+## Prioridad 2: Sistema de invitaciones (Phase 01)
+
+> La tabla `invitations` ya existe en el esquema y tiene políticas RLS. Solo falta implementar la lógica.
+
 - [ ] Crear server actions:
   - `inviteUser` (solo SUPER_ADMIN) – genera token, guarda, envía email con Resend.
-  - `acceptInvitation` (público) – valida token, crea usuario en Supabase Auth, inserta en `users`, marca usado.
+  - `acceptInvitation` (público) – valida token, crea usuario en Supabase Auth, inserta en `users` y `people`, marca usado.
   - `resendInvitation`, `revokeInvitation`.
 - [ ] UI para SUPER_ADMIN: panel `/admin/users` (invitar, listar pendientes, resend, revoke).
-- [ ] Página pública `/accept-invite` (formulario password + nombre).
-- [ ] Configurar Resend (variables de entorno, dominio verificado).
+- [ ] Página pública `/accept-invite` (formulario password + nombre + apellido).
+- [ ] Configurar Resend (variables de entorno, dominio verificado, plantilla de email).
 - [ ] Probar flujo completo: invitación → email → aceptación → login.
 
 ## Prioridad 3: Módulo People (completar funcionalidades faltantes)
 
-- [ ] Tags: crear tabla `person_tags` y relaciones, CRUD de tags (admin), asignación a personas.
+- [ ] Tags: CRUD de tags (admin), asignación a personas (tablas `person_tags` y `people_tags_relations` ya existen).
 - [ ] Notas: implementar agregar notas a persona (con visibilidad private/internal/public).
 - [ ] Adjuntos (fotos de perfil, documentos): usar Supabase Storage, integración con UI.
 - [ ] Búsqueda y filtros (por nombre, email, tag).
@@ -57,7 +66,6 @@
 
 ## Tareas técnicas transversales
 
-- [ ] Configurar Drizzle correctamente en monorepo (paquete `@owofvzla/db`).
 - [ ] Generar tipos de Supabase (`supabase gen types`) y sincronizar con TS.
 - [ ] Eliminar todo `as never` de las queries (usar tipos correctos).
 - [ ] Unificar naming: cambiar todos los `@umaf` por `@owofvzla` (package.json, imports).

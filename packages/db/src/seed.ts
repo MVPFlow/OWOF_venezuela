@@ -7,15 +7,22 @@ import * as schema from "./schema.js";
 const ORG_ID = "a1b2c3d4-e5f6-7890-abcd-ef1234567890";
 const ORG_SLUG = "owofvzla";
 const ORG_NAME = "One World One Family Venezuela";
-const ADMIN_EMAIL = "saturno@owofvzla.org";
-const ADMIN_PASSWORD = "Admin123!";
 
-async function main() {
-  const connectionString = process.env.SUPABASE_DATABASE_URL;
-  if (!connectionString) {
-    console.error("SUPABASE_DATABASE_URL environment variable is required");
+function getEnvVar(name: string, defaultValue?: string): string {
+  const value = process.env[name] ?? defaultValue;
+  if (!value) {
+    console.error(`${name} environment variable is required`);
     process.exit(1);
   }
+  return value;
+}
+
+async function main() {
+  const connectionString = getEnvVar("SUPABASE_DATABASE_URL");
+  const adminEmail = getEnvVar("SUPER_ADMIN_EMAIL", "saturno@owofvzla.org");
+  const adminPassword = getEnvVar("SUPER_ADMIN_PASSWORD", "Admin123!");
+  const adminFirstName = getEnvVar("SUPER_ADMIN_FIRST_NAME", "Saturno");
+  const adminLastName = getEnvVar("SUPER_ADMIN_LAST_NAME", "Mangieri");
 
   const queryClient = postgres(connectionString, { max: 1 });
   const db = drizzle(queryClient, { schema });
@@ -38,7 +45,7 @@ async function main() {
   let adminUserId: string;
 
   const existingUser = await db.select().from(schema.users)
-    .where(eq(schema.users.email, ADMIN_EMAIL))
+    .where(eq(schema.users.email, adminEmail))
     .limit(1);
 
   if (existingUser.length > 0) {
@@ -46,11 +53,11 @@ async function main() {
     console.log("Admin user already exists:", adminUserId);
   } else {
     const salt = await bcrypt.genSalt(10);
-    const passwordHash = await bcrypt.hash(ADMIN_PASSWORD, salt);
+    const passwordHash = await bcrypt.hash(adminPassword, salt);
 
     const inserted = await db.insert(schema.users).values({
       organizationId: ORG_ID,
-      email: ADMIN_EMAIL,
+      email: adminEmail,
       passwordHash,
       role: "SUPER_ADMIN",
       status: "active",
@@ -62,7 +69,7 @@ async function main() {
   // 3. Person record for admin
   console.log("Creating person record for admin...");
   const existingPerson = await db.select().from(schema.people)
-    .where(eq(schema.people.email, ADMIN_EMAIL))
+    .where(eq(schema.people.email, adminEmail))
     .limit(1);
 
   if (existingPerson.length > 0) {
@@ -71,9 +78,9 @@ async function main() {
     const inserted = await db.insert(schema.people).values({
       organizationId: ORG_ID,
       userId: adminUserId,
-      firstName: "Saturno",
-      lastName: "Mangieri",
-      email: ADMIN_EMAIL,
+      firstName: adminFirstName,
+      lastName: adminLastName,
+      email: adminEmail,
       status: "active",
     }).returning();
     console.log("Person record created:", inserted[0].id);
@@ -109,8 +116,7 @@ async function main() {
   console.log("\nSeed completed successfully!");
   console.log("-".repeat(40));
   console.log("Organization:", ORG_NAME, "(".concat(ORG_SLUG, ")"));
-  console.log("Admin email:", ADMIN_EMAIL);
-  console.log("Admin password:", ADMIN_PASSWORD);
+  console.log("Admin email:", adminEmail);
   console.log("-".repeat(40));
 
   await queryClient.end();
