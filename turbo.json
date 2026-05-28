@@ -12,6 +12,18 @@
     "lint": {},
     "clean": {
       "cache": false
+    },
+    "generate": {
+      "cache": false
+    },
+    "migrate": {
+      "cache": false
+    },
+    "seed": {
+      "cache": false
+    },
+    "studio": {
+      "cache": false
     }
   }
 }

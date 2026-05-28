@@ -8,7 +8,11 @@
     "build": "turbo build",
     "lint": "turbo lint",
     "clean": "turbo clean",
-    "reset": "pnpm clean && powershell -Command \"Remove-Item -Recurse -Force apps/web/.next -ErrorAction SilentlyContinue; Write-Output 'Cache cleaned'\" && pnpm dev"
+    "reset": "pnpm clean && powershell -Command \"Remove-Item -Recurse -Force apps/web/.next -ErrorAction SilentlyContinue; Write-Output 'Cache cleaned'\" && pnpm dev",
+    "db:generate": "pnpm --filter @owofvzla/db generate",
+    "db:migrate": "pnpm --filter @owofvzla/db migrate",
+    "db:seed": "pnpm --filter @owofvzla/db seed",
+    "db:studio": "pnpm --filter @owofvzla/db studio"
   },
   "engines": {
     "node": ">=18"
